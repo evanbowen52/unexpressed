@@ -1004,7 +1004,7 @@
   // --- ATLAS STATE & STORAGE ---
   const ATLAS_STORAGE_KEY = "somatic_refactor_atlas";
   let atlas = loadAtlas();
-  let openSections = new Set(atlas.sections.map(s => s.id));
+  let openSections = new Set();
   let expandedEvents = new Set();
   let checkinState = {};
   let editingTarget = null;
@@ -1132,7 +1132,6 @@
     ev.innerHTML = `
       <div class="event-row" onclick="toggleEvent('${sec.id}', '${pat.id}')">
         <div class="event-row-left">
-          <span class="event-bolt">⚡</span>
           <div class="event-summary-wrap">
             <span class="event-title-text">${pat.title}</span>
             <div class="event-pills-line">

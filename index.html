@@ -409,194 +409,80 @@
       font-style: normal;
     }
 
-    /* ATLAS & PATTERN CARDS */
-    .atlas-controls {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
+    /* SEARCH BAR */
+    .search-bar-wrap { position: relative; display: flex; align-items: center; }
+    .search-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); padding: 11px 36px 11px 14px; font-size: 0.92rem; font-family: inherit; }
+    .search-input:focus { outline: none; border-color: var(--accent); }
+    .clear-search-btn { position: absolute; right: 12px; background: transparent; border: none; color: var(--muted); font-size: 0.95rem; cursor: pointer; padding: 4px; }
 
-    .atlas-search {
-      flex: 1;
-      min-width: 180px;
-      margin-top: 0 !important;
-    }
+    /* SECTIONS */
+    .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; width: 100%; }
+    .section-header { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: var(--surface); }
+    .section-header:hover { background: rgba(255, 255, 255, 0.02); }
+    .section-header-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .chevron { font-size: 0.85rem; color: var(--muted); width: 16px; display: inline-block; text-align: center; }
+    .section-title-text { font-size: 0.95rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .count-badge { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.76rem; padding: 2px 7px; border-radius: 10px; background: var(--surface-alt); border: 1px solid var(--border); color: var(--muted); font-weight: 600; }
+    .section-header-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .order-btn { background: transparent; border: 1px solid transparent; color: var(--muted); padding: 4px 6px; border-radius: 6px; font-size: 0.72rem; cursor: pointer; line-height: 1; }
+    .order-btn:hover { background: var(--surface-alt); border-color: var(--border); color: var(--text); }
+    .order-btn:disabled { opacity: 0.2; pointer-events: none; }
+    .danger-icon-btn { background: transparent; border: 1px solid transparent; color: var(--muted); padding: 4px 7px; border-radius: 6px; font-size: 0.82rem; cursor: pointer; }
+    .danger-icon-btn:hover { border-color: var(--red); color: var(--red); }
+    .section-body { border-top: 1px solid var(--border); padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; background: rgba(0, 0, 0, 0.12); width: 100%; }
 
-    .section-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px;
-      margin-bottom: 14px;
-    }
+    /* EVENT ROWS */
+    .event-card { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 9px; overflow: hidden; transition: all 0.12s ease; width: 100%; display: flex; flex-direction: column; }
+    .event-card.expanded { border-color: rgba(88, 166, 255, 0.35); }
+    .event-row { padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; gap: 8px; width: 100%; }
+    .event-row:hover { background: rgba(255, 255, 255, 0.02); }
+    .event-row-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+    .event-summary-wrap { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+    .event-title-text { font-size: 0.91rem; font-weight: 700; color: #fff; line-height: 1.35; }
+    .event-pills-line { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .threat-pill { font-size: 0.73rem; font-weight: 600; color: #ffb3ae; background: var(--red-bg); border: 1px solid rgba(248, 81, 73, 0.35); padding: 1px 6px; border-radius: 4px; }
+    .reality-summary-text { font-size: 0.77rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px; }
+    .event-row-right { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+    .event-chevron { color: var(--muted); font-size: 0.78rem; padding: 4px; }
+    .event-details { border-top: 1px solid var(--border); padding: 12px; background: rgba(13, 17, 23, 0.45); display: flex; flex-direction: column; gap: 10px; width: 100%; }
+    .detail-block { display: flex; flex-direction: column; gap: 4px; }
+    .detail-label { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+    .detail-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag-domain, .tag-pattern, .tag-mod { font-size: 0.75rem; padding: 2px 7px; border-radius: 4px; background: var(--surface); border: 1px solid var(--border); }
+    .tag-domain { color: var(--accent); }
+    .tag-pattern { color: var(--text); }
+    .tag-mod { color: #ffd37a; border-color: rgba(210, 153, 34, 0.4); }
+    .threat-box { font-size: 0.85rem; color: #ffb3ae; background: var(--red-bg); border-left: 3px solid var(--red); padding: 7px 10px; border-radius: 4px; line-height: 1.4; }
+    .reality-box { font-size: 0.86rem; color: #d2fed7; background: var(--green-bg); border-left: 3px solid var(--green); padding: 8px 10px; border-radius: 4px; line-height: 1.42; }
+    .notes-box { font-size: 0.82rem; color: var(--muted); font-style: italic; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); padding: 7px 10px; border-radius: 6px; line-height: 1.4; }
 
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      gap: 8px;
-    }
-
-    .section-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .section-actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    .pattern-card {
-      background: var(--surface-alt);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .pattern-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .pattern-title {
-      font-size: 0.93rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.35;
-    }
-
-    .pattern-actions {
-      display: flex;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-
-    .run-btn {
-      background: rgba(63, 185, 80, 0.2);
-      border: 1px solid var(--green);
-      color: #aef5b8;
-      padding: 5px 11px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .run-btn:hover {
-      background: var(--green);
-      color: #0d1117;
-    }
-
-    .danger-btn {
-      background: transparent;
-      border: 1px solid transparent;
-      color: var(--muted);
-      padding: 5px 8px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-
-    .danger-btn:hover {
-      border-color: var(--red);
-      color: var(--red);
-    }
-
-    .pattern-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
-
-    .pattern-tag {
-      font-size: 0.74rem;
-      padding: 2px 7px;
-      border-radius: 4px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    .pattern-tag.source { color: var(--accent); }
-    .pattern-tag.modifier { color: #ffd37a; border-color: rgba(210, 153, 34, 0.4); }
-    .pattern-tag.saic { color: #ffb3ae; border-color: rgba(248, 81, 73, 0.4); }
-
-    .pattern-reality {
-      font-size: 0.84rem;
-      color: #e6edf3;
-      line-height: 1.4;
-      background: rgba(0, 0, 0, 0.2);
-      padding: 6px 9px;
-      border-radius: 6px;
-      border-left: 3px solid var(--green);
-    }
-
-    .pattern-notes {
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-style: italic;
-      padding-top: 2px;
-    }
-
-    .global-conclusions-box {
-      margin-top: 14px;
-    }
-
-    .nav-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 14px;
-    }
-
-    .nav-back-btn {
-      background: var(--surface-alt);
-      border: 1px solid var(--border);
-      color: var(--accent);
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.84rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #238636;
-      color: #fff;
-      padding: 10px 18px;
-      border-radius: 20px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-      z-index: 200;
-    }
-
+    .body-checkin-drawer { border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden; margin-top: 4px; }
+    .body-checkin-toggle { padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; font-size: 0.81rem; font-weight: 600; color: var(--muted); }
+    .body-checkin-toggle:hover { color: var(--text); }
+    .body-checkin-content { border-top: 1px solid var(--border); padding: 10px 12px; display: flex; flex-direction: column; gap: 10px; background: rgba(0, 0, 0, 0.15); }
+    .axis-group { display: flex; flex-direction: column; gap: 5px; }
+    .axis-label { font-size: 0.74rem; font-weight: 600; color: var(--muted); }
+    .axis-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .axis-btn { background: var(--surface-alt); border: 1px solid var(--border); color: var(--text); padding: 8px 6px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; text-align: center; }
+    .axis-btn.active { background: rgba(88, 166, 255, 0.2); border-color: var(--accent); color: #fff; }
+    .checkin-result { font-size: 0.82rem; padding: 8px 10px; border-radius: 6px; font-weight: 600; display: none; text-align: center; }
+    .checkin-result.red { display: block; background: var(--red-bg); border: 1px solid var(--red); color: #ffb3ae; }
+    .checkin-result.green { display: block; background: var(--green-bg); border: 1px solid var(--green); color: #aef5b8; }
+    .checkin-result.yellow { display: block; background: var(--yellow-bg); border: 1px solid var(--yellow); color: #ffd37a; }
+    .checkin-result.blue { display: block; background: rgba(88, 166, 255, 0.16); border: 1px solid var(--accent); color: #a5d6ff; }
+    .event-footer-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+    .edit-event-btn { background: var(--surface-alt); border: 1px solid var(--border); color: var(--text); padding: 6px 14px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+    .edit-event-btn:hover { border-color: var(--accent); color: #fff; }
+    .delete-event-btn { background: transparent; border: 1px solid transparent; color: var(--muted); padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; cursor: pointer; }
+    .delete-event-btn:hover { border-color: var(--red); color: var(--red); }
+    .conclusions-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; width: 100%; }
+    .conclusions-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .conclusions-title { font-size: 0.92rem; font-weight: 700; color: var(--text); }
+    .status-pill { font-size: 0.72rem; color: var(--green); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; }
+    .conclusions-sub { font-size: 0.81rem; color: var(--muted); margin: 0 0 10px; line-height: 1.4; }
+    .conclusions-textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 10px 12px; font-size: 0.88rem; font-family: inherit; line-height: 1.45; resize: vertical; }
+    .conclusions-textarea:focus { outline: none; border-color: var(--accent); }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #238636; color: #fff; padding: 9px 18px; border-radius: 20px; font-size: 0.86rem; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 200; }
     .toast.show { opacity: 1; }
   </style>
 </head>
@@ -1197,7 +1083,7 @@
           <button type="button" class="delete-event-btn" onclick="deletePattern('${sec.id}', '${pat.id}')">✕ Delete</button>
         </div>
       </div>
-    </div>
+    </div>`;
     return ev;
   }
 
@@ -1485,191 +1371,6 @@
   }
 
   renderAtlas();
-</script>
-</body>
-</html>
-
-
-
-
-
-  function formatDuration(ms) {
-    if (!ms || ms < 0) return "0m15s";
-    const totalSec = Math.max(5, Math.round(ms / 1000));
-    const m = Math.floor(totalSec / 60);
-    const s = totalSec % 60;
-    return `${m}m${String(s).padStart(2, "0")}s`;
-  }
-
-  function buildProcessString() {
-    const c1 = state.code1 || "code1";
-    const c2 = state.code2 || state.code1 || "code2";
-    const c3 = state.code3 || "code3";
-    const t1 = state.tCode1 || state.t0;
-    const t2 = state.tCode2 || Date.now();
-    const t3 = state.tCode3 || Date.now();
-
-    const d1 = formatDuration(t2 - t1);
-    const d2 = formatDuration(t3 - t2);
-    return `${c1} --> ${d1} --> ${c2}:${state.loops} --> ${d2} --> ${c3}`;
-  }
-
-  function updateTelemetry() {
-    document.getElementById("telemetry-preview").textContent = buildProcessString();
-  }
-
-  // --- SAVE & MARKDOWN EXPORT ---
-  function compileMarkdown(s, isoDate, processStr) {
-    const triggerTags = [s.domain, s.pattern, ...s.modifiers].filter(Boolean).join(" · ") || "Unspecified";
-    const bodyFeel = s.sensations.length ? s.sensations.join(", ") : "—";
-    const bodyLoc = s.locations.length ? s.locations.join(", ") : "—";
-    const saicList = s.saic.length ? s.saic.join(", ") : "None";
-    const realityList = [...s.realities, s.realityNote].filter(Boolean).join("; ") || "—";
-    const softenList = s.softens.length ? s.softens.join(", ") : "—";
-    const releaseList = s.releases.length ? s.releases.join(", ") : "Quiet settle";
-
-    return `---
-type: somatic-refactor-log
-date: ${isoDate}
-domain: ${s.domain || "null"}
-pattern: ${s.pattern || "null"}
-modifiers: [${s.modifiers.join(", ")}]
-saic: [${s.saic.join(", ")}]
-code_start: ${s.code1 || "null"}
-charge_start: ${s.charge || "null"}
-code_mid: ${s.code2 || s.code1 || "null"}
-loops: ${s.loops}
-code_end: ${s.code3 || "null"}
-release: [${releaseList}]
-process: "${processStr}"
----
-
-0. Calm
-1. **When** [${triggerTags}] happened: *${s.factsNote || "Logged via quick-tap."}*
-2. **My body felt** ${bodyFeel} **in** ${bodyLoc} — **code:** \`${s.code1 || "—"}\` (charge: \`${s.charge || "—"}/10\`)
-3. **My system assumed** *(SAIC: ${saicList})*: *${s.assumptionNote || "Implicit SAIC threat pattern."}*
-4. **In reality:** ${realityList}. **Practice body feeling:** ${softenList} (\`${s.code2 || s.code1 || "—"}:${s.loops}\`)
-5. **Re-check code:** \`${s.code3 || "—"}\` — **Release:** ${releaseList}
-6. **Calm again. Done.**
-`;
-  }
-
-  function finishSession() {
-    if (!state.tCode3) state.tCode3 = Date.now();
-    const snapshot = {
-      ...state,
-      factsNote: document.getElementById("facts-note").value.trim(),
-      assumptionNote: document.getElementById("assumption-note").value.trim(),
-      realityNote: document.getElementById("reality-note").value.trim()
-    };
-    const isoDate = new Date().toISOString();
-    const processStr = buildProcessString();
-    const activeTitle = document.getElementById("workflow-active-title")?.textContent || "Pass";
-    const md = compileMarkdown(snapshot, isoDate, processStr);
-    lastSavedMarkdown = md;
-
-    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
-    logs.unshift({ id: isoDate, process: processStr, trigger: `${activeTitle} (${snapshot.domain || "—"} · ${snapshot.pattern || "—"})`, md });
-    localStorage.setItem("somatic_refactor_logs", JSON.stringify(logs));
-    updateLogCount();
-
-    showToast("Reconsolidation pass saved!");
-  }
-
-  function exportAtlasMarkdown() {
-    let out = "# Somatic Refactor: Personal Field Guide & Trigger Map\n\n";
-    atlas.sections.forEach((sec, idx) => {
-      out += `## ${idx + 1}. ${sec.title}\n\n`;
-      out += "| Recurring Scenario | Step 1: Domain & Pattern | Step 3: SAIC Threats | Step 4: Reality Anchor |\n";
-      out += "| :--- | :--- | :--- | :--- |\n";
-      sec.patterns.forEach(p => {
-        const mods = p.modifiers.length ? ` + [${p.modifiers.join(", ")}]` : "";
-        const saicStr = p.saic.join(" + ");
-        const notesStr = p.notes ? ` *(${p.notes})*` : "";
-        out += `| **${p.title}** | \`${p.domain}\` + \`${p.pattern}\`${mods} | **${saicStr}** | ${p.reality}${notesStr} |\n`;
-      });
-      out += "\n---\n\n";
-    });
-    if (atlas.globalConclusions) {
-      out += "## Global Conclusions & Meta-Observations\n\n";
-      out += atlas.globalConclusions + "\n";
-    }
-    copyText(out);
-    showToast("Exported Field Guide to clipboard");
-  }
-
-  function updateLogCount() {
-    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
-    document.getElementById("log-count").textContent = logs.length;
-  }
-
-  function openHistory() {
-    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
-    const list = document.getElementById("history-list");
-    list.innerHTML = logs.length ? "" : `<p style="color:var(--muted); font-size:0.88rem;">No saved logs yet.</p>`;
-    logs.forEach((log, idx) => {
-      const div = document.createElement("div");
-      div.className = "guide-item";
-      div.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-          <div class="guide-title">${log.id.slice(0, 10)} — ${log.trigger}</div>
-          <button type="button" class="danger-btn" onclick="deleteLogIndex(${idx})" title="Delete">✕</button>
-        </div>
-        <div class="guide-meta" style="font-family:monospace; margin-bottom:8px;">${log.process}</div>
-        <button class="icon-btn" onclick="copyLogIndex(${idx})">Copy Log</button>
-      `;
-      list.appendChild(div);
-    });
-    openModal("history-modal");
-  }
-
-  function deleteLogIndex(idx) {
-    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
-    logs.splice(idx, 1);
-    localStorage.setItem("somatic_refactor_logs", JSON.stringify(logs));
-    updateLogCount();
-    openHistory();
-    showToast("Log deleted");
-  }
-
-  function copyLogIndex(idx) {
-    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
-    if (logs[idx]) copyText(logs[idx].md);
-  }
-
-  function openModal(id) { document.getElementById(id).classList.add("open"); }
-  function closeModal(id) { document.getElementById(id).classList.remove("open"); }
-  function closeModalOnBg(e, id) { if (e.target.id === id) closeModal(id); }
-
-  function copyText(str) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(str).then(() => showToast("Copied Obsidian Markdown"));
-    } else {
-      const ta = document.createElement("textarea");
-      ta.value = str;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-      showToast("Copied Obsidian Markdown");
-    }
-  }
-
-  function showToast(msg) {
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 2000);
-  }
-
-  // Register Service Worker for offline PWA support
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js").catch(() => {});
-    });
-  }
-
-  init();
 </script>
 </body>
 </html>

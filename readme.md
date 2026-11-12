@@ -28,8 +28,8 @@ A zero-backend, offline-first Progressive Web App designed for **post-regulation
 
 ## 3. Sprint Roadmap: The Pattern Atlas Pivot
 
-### Phase 0: Baseline Safety & Version Control (Immediate)
-- [ ] **Initialize Git Repository:** Create `.gitignore`, initialize local git repo, stage baseline files (`index.html`, `FIELD_GUIDE.md`, `MANUAL.md`, `README.md`, `manifest.json`, `sw.js`), and commit immutable pre-pivot baseline checkpoint.
+### Phase 0: Baseline Safety & Version Control (Completed)
+- [x] **Initialize Git Repository:** Create `.gitignore`, initialize local git repo, stage baseline files (`index.html`, `FIELD_GUIDE.md`, `FIELD_GUIDE_PROMPT.md`, `MANUAL.md`, `README.md`, `manifest.json`, `sw.js`), and commit immutable pre-pivot baseline checkpoint (`2c426f6`).
 
 ### Phase 1: Data Store & Schema Migration
 - [ ] **Reactive Local-First Store:** Define hierarchical schema (`sections[]` containing `patterns[]` with `id`, `title`, `domain`, `pattern`, `modifiers`, `saic`, `reality`, `notes`, plus top-level `globalConclusions`).

@@ -73,3 +73,12 @@ When a novel trigger hits and isn't in the tables above, ask three questions:
    * *"I am trapped, powerless, forced, or responsible for fixing what I can't control"* $\rightarrow$ **`Agency`**
    * *"I am failing my standards, exposed, incompetent, or complicit"* $\rightarrow$ **`Identity`**
    * *"I am abandoned, misunderstood, cast out, or losing someone"* $\rightarrow$ **`Connection`**
+
+
+---
+
+## 7. Global Conclusions & Meta-Observations
+
+* **Primary Driver Overlap:** High-acuity spikes consistently trace back to **Identity + Connection** (fear of having caused harm, being thoughtless/exclusionary, or failing personal standards of care and composure).
+* **Omnipotent Responsibility Bias:** An automatic tendency to assume retroactive causal control over complex biology or external outcomes (e.g., retroactively fixing crisis calls, blaming oneself for multi-factorial child mental health based on a snapped moment of anger).
+* **Somatic Grounding Rule:** Internal physiological bracing in isolation never alters external reality or edits past events. Baseline calm must be restored before genuine adult agency and clean communication can occur.

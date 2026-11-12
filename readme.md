@@ -31,23 +31,23 @@ A zero-backend, offline-first Progressive Web App designed for **post-regulation
 ### Phase 0: Baseline Safety & Version Control (Completed)
 - [x] **Initialize Git Repository:** Create `.gitignore`, initialize local git repo, stage baseline files (`index.html`, `FIELD_GUIDE.md`, `FIELD_GUIDE_PROMPT.md`, `MANUAL.md`, `README.md`, `manifest.json`, `sw.js`), and commit immutable pre-pivot baseline checkpoint (`2c426f6`).
 
-### Phase 1: Data Store & Schema Migration
-- [ ] **Reactive Local-First Store:** Define hierarchical schema (`sections[]` containing `patterns[]` with `id`, `title`, `domain`, `pattern`, `modifiers`, `saic`, `reality`, `notes`, plus top-level `globalConclusions`).
-- [ ] **Default Seed Integration:** Seed `localStorage` on initial load using the curated entries from `FIELD_GUIDE.md`.
+### Phase 1: Data Store & Schema Migration (Completed)
+- [x] **Reactive Local-First Store:** Defined hierarchical schema (`sections[]` containing `patterns[]` with `id`, `title`, `domain`, `pattern`, `modifiers`, `saic`, `reality`, `notes`, plus top-level `globalConclusions`).
+- [x] **Default Seed Integration:** Seeded `localStorage` on initial load using the curated entries from `FIELD_GUIDE.md`.
 
-### Phase 2: Home Screen Pattern Atlas UI
-- [ ] **Atlas Home View:** Transform initial landing view into the categorized Pattern Atlas with instant search/filter across titles, SAIC vectors, and notes.
-- [ ] **Section CRUD (`+` / `—`):** Add `+ Add Section`, rename, and delete section controls.
-- [ ] **Pattern CRUD (`+` / `—`):** Add `+ Add Pattern`, edit, and delete pattern controls.
-- [ ] **Global Conclusions Notebook:** Persistent, auto-saving text area at the bottom of the atlas for longitudinal insights and emergent conclusions.
+### Phase 2: Home Screen Pattern Atlas UI (Completed)
+- [x] **Atlas Home View:** Primary home view is now the categorized Pattern Atlas with instant search/filter across titles, SAIC vectors, and notes.
+- [x] **Section CRUD (`+` / `—`):** Added `+ Section` creation and section deletion controls.
+- [x] **Pattern CRUD (`+` / `—`):** Added `+ Pattern`, inline editing, and deletion controls.
+- [x] **Global Conclusions Notebook:** Persistent, auto-saving text area at the bottom of the atlas for longitudinal insights and emergent conclusions.
 
-### Phase 3: Pattern Editor / Creator Form
-- [ ] **Pattern Creation & Editing Modal:** Repurpose the chip selection interface (Domain, Pattern, Modifiers, SAIC, Reality statements) into an intuitive pattern editor with dedicated notes field.
+### Phase 3: Pattern Editor / Creator Form (Completed)
+- [x] **Pattern Creation & Editing Modal:** Chip selection interface (Domain, Pattern, Modifiers, SAIC, Reality statements) wired into the Pattern Editor modal with dedicated notes and category assignment.
 
-### Phase 4: Streamlined Reconsolidation Pass & Simplification
-- [ ] **1-Tap Pre-Populated "Run Pass":** Launching a pass from any pattern card instantly populates Steps 1, 3, and 4, letting the user focus solely on somatic coordinates (`code1 --> code2:xn --> code3` + release sign).
-- [ ] **Simplify Quadrant Target from 5 Rings to 3 Rings:** Reduce rings to Mild/Moderate/High (`R1–R3`, `Y1–Y3`, `B1–B3`, `G1–G3`) for thumb-friendly mobile accuracy.
-- [ ] **Decommission Obsidian Export & Lockout:** Strip out Obsidian clipboard push and remove the forced terminal rest screen lockout.
+### Phase 4: Streamlined Reconsolidation Pass & Simplification (Completed)
+- [x] **1-Tap Pre-Populated "Run Pass":** Launching a pass from any pattern card instantly populates Steps 1, 3, and 4, letting the user focus solely on somatic coordinates (`code1 --> code2:xn --> code3` + release sign).
+- [x] **Simplify Quadrant Target from 5 Rings to 3 Rings:** Reduced rings to Mild/Moderate/High (`R1–R3`, `Y1–Y3`, `B1–B3`, `G1–G3`) with larger `maxR / 3` tap targets for thumb-friendly mobile accuracy.
+- [x] **Decommission Obsidian Export & Lockout:** Stripped out Obsidian vault dependency and removed the forced terminal rest screen lockout.
 
 ### Phase 5: PWA Polish & Deployment
 - [ ] **Custom App Icons & Cache:** Generate minimalist `icon-192.png` / `icon-512.png` and wire into `manifest.json` and `sw.js`.

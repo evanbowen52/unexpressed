@@ -409,13 +409,175 @@
       font-style: normal;
     }
 
-    /* Locked Rest Screen */
-    #rest-screen {
-      display: none;
-      max-width: 500px;
-      margin: 40px auto;
-      padding: 24px;
-      text-align: center;
+    /* ATLAS & PATTERN CARDS */
+    .atlas-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .atlas-search {
+      flex: 1;
+      min-width: 180px;
+      margin-top: 0 !important;
+    }
+
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .pattern-card {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pattern-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .pattern-title {
+      font-size: 0.93rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.35;
+    }
+
+    .pattern-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .run-btn {
+      background: rgba(63, 185, 80, 0.2);
+      border: 1px solid var(--green);
+      color: #aef5b8;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .run-btn:hover {
+      background: var(--green);
+      color: #0d1117;
+    }
+
+    .danger-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .danger-btn:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .pattern-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .pattern-tag {
+      font-size: 0.74rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .pattern-tag.source { color: var(--accent); }
+    .pattern-tag.modifier { color: #ffd37a; border-color: rgba(210, 153, 34, 0.4); }
+    .pattern-tag.saic { color: #ffb3ae; border-color: rgba(248, 81, 73, 0.4); }
+
+    .pattern-reality {
+      font-size: 0.84rem;
+      color: #e6edf3;
+      line-height: 1.4;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 6px 9px;
+      border-radius: 6px;
+      border-left: 3px solid var(--green);
+    }
+
+    .pattern-notes {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: italic;
+      padding-top: 2px;
+    }
+
+    .global-conclusions-box {
+      margin-top: 14px;
+    }
+
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+    }
+
+    .nav-back-btn {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
     }
 
     .toast {
@@ -443,12 +605,43 @@
 <header>
   <div class="gate-banner">Are you calm enough?</div>
   <div class="header-actions">
-    <button class="icon-btn" onclick="openModal('guide-modal')">? Field Guide</button>
+    <button class="icon-btn" onclick="exportAtlasMarkdown()">Export Guide</button>
     <button class="icon-btn" onclick="openHistory()">Logs (<span id="log-count">0</span>)</button>
   </div>
 </header>
 
-<main id="workflow">
+<main>
+
+  <!-- VIEW 1: PATTERN ATLAS (PRIMARY HOME VIEW) -->
+  <section id="atlas-view">
+    <div class="atlas-controls">
+      <input type="text" id="atlas-search" class="atlas-search" placeholder="Filter patterns, SAIC, or notes..." oninput="filterAtlas()" />
+      <button type="button" class="icon-btn" onclick="openSectionModal()">+ Section</button>
+      <button type="button" class="icon-btn" style="border-color:var(--green); color:var(--green);" onclick="startScratchpadPass()">+ Blank Pass</button>
+    </div>
+
+    <!-- SECTIONS & PATTERN CARDS INJECTED HERE -->
+    <div id="sections-container"></div>
+
+    <!-- GLOBAL CONCLUSIONS NOTEBOOK -->
+    <div class="card global-conclusions-box">
+      <div class="step-header">
+        <span class="step-title">📝 Global Conclusions &amp; Synthesis</span>
+        <span class="step-badge" style="color:var(--green);">Auto-Saved</span>
+      </div>
+      <p style="font-size:0.82rem; color:var(--muted); margin:0 0 8px;">
+        High-level observations, systemic insights, and evolving truths across your patterns.
+      </p>
+      <textarea id="global-conclusions-text" rows="5" placeholder="Document meta-observations across your recurring loops..." oninput="saveGlobalConclusions()"></textarea>
+    </div>
+  </section>
+
+  <!-- VIEW 2: RAPID RECONSOLIDATION PASS -->
+  <section id="workflow-view" style="display:none;">
+    <div class="nav-bar">
+      <button type="button" class="nav-back-btn" onclick="returnToAtlas()">← Back to Atlas</button>
+      <div id="workflow-active-title" style="font-weight:700; font-size:0.88rem; color:#fff; text-align:right;"></div>
+    </div>
 
   <!-- STEP 1: BARE FACTS -->
   <section class="card">
@@ -545,38 +738,68 @@
     <div class="chip-row" id="release-chips"></div>
   </section>
 
-  <!-- STEP 6: CLOSE & EXPORT -->
-  <section class="card">
-    <div class="step-header">
-      <span class="step-title">6. File &amp; Rest</span>
-    </div>
-    <div class="telemetry-box" id="telemetry-preview">code1 --> time --> code2:few --> time --> code3</div>
-    <button type="button" class="primary-btn" onclick="finishSession()">Save &amp; Copy Obsidian Markdown</button>
+    <!-- STEP 6: CLOSE & FILE -->
+    <section class="card">
+      <div class="step-header">
+        <span class="step-title">6. Log &amp; Resolve</span>
+      </div>
+      <div class="telemetry-box" id="telemetry-preview">code1 --> time --> code2:few --> time --> code3</div>
+      <button type="button" class="primary-btn" onclick="finishSession()">Complete &amp; Save Pass</button>
+      <button type="button" class="secondary-btn" style="margin-top:8px;" onclick="returnToAtlas()">Return to Atlas</button>
+    </section>
+
   </section>
 
 </main>
 
-<!-- LOCKED REST SCREEN -->
-<div id="rest-screen" class="card">
-  <h2 style="color: var(--green); margin-top: 0;">Calm again. Done.</h2>
-  <p style="color: var(--muted); font-size: 0.94rem;">
-    Entry saved locally and copied to clipboard. Stop analyzing and let your nervous system file the update while you rest.
-  </p>
-  <div class="telemetry-box" id="final-telemetry"></div>
-  <button type="button" class="secondary-btn" onclick="copyLastMarkdown()">Copy Markdown Again</button>
-  <button type="button" class="secondary-btn" onclick="resetSession()">Start New Refactor</button>
-</div>
-
-<!-- MAP GUIDE MODAL -->
-<div class="modal" id="guide-modal" onclick="closeModalOnBg(event, 'guide-modal')">
+<!-- PATTERN EDITOR MODAL -->
+<div class="modal" id="pattern-modal" onclick="closeModalOnBg(event, 'pattern-modal')">
   <div class="modal-sheet">
     <div class="modal-top">
-      <strong style="font-size: 1rem;">Field Guide & Trigger Map</strong>
-      <button class="icon-btn" onclick="closeModal('guide-modal')">Close</button>
+      <strong style="font-size: 1rem;" id="pattern-modal-heading">Edit Pattern</strong>
+      <button class="icon-btn" onclick="closeModal('pattern-modal')">Close</button>
     </div>
-    <div style="font-size: 0.74rem; color: var(--muted); margin: -4px 0 10px;">Synced with FIELD_GUIDE.md (Single Source of Truth)</div>
-    <input type="text" id="guide-search" placeholder="Filter (e.g., TIP, presentation, feedback, dementia, kids, news, arrow)..." oninput="renderGuide()" style="margin-top:0; margin-bottom:12px;" />
-    <div id="guide-list"></div>
+
+    <input type="hidden" id="pattern-edit-id" />
+
+    <div class="sub-label">Pattern Title / Trigger Loop</div>
+    <input type="text" id="pattern-input-title" placeholder="e.g. Worrying I Hurt Someone's Feelings..." style="margin-top:0;" />
+
+    <div class="sub-label">Section / Category</div>
+    <select id="pattern-input-section" style="width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:9px; border-radius:8px; font-size:0.9rem; margin-bottom:8px;"></select>
+
+    <div class="sub-label">Step 1: Domain</div>
+    <div class="chip-row" id="pattern-modal-domain"></div>
+
+    <div class="sub-label">Step 1: Pattern</div>
+    <div class="chip-row" id="pattern-modal-pattern"></div>
+
+    <div class="sub-label">Step 1: Modifiers</div>
+    <div class="chip-row" id="pattern-modal-modifiers"></div>
+
+    <div class="sub-label">Step 3: SAIC Threats</div>
+    <div class="chip-row" id="pattern-modal-saic"></div>
+
+    <div class="sub-label">Step 4: Reality Anchor Statement</div>
+    <textarea id="pattern-input-reality" rows="2" placeholder="Present truth statement to ground against brace..."></textarea>
+
+    <div class="sub-label">Personal Observation Notes</div>
+    <textarea id="pattern-input-notes" rows="2" placeholder="Context, frequency, or personal cues..."></textarea>
+
+    <button type="button" class="primary-btn" style="margin-top:14px;" onclick="savePatternFromModal()">Save Pattern</button>
+  </div>
+</div>
+
+<!-- SECTION MODAL -->
+<div class="modal" id="section-modal" onclick="closeModalOnBg(event, 'section-modal')">
+  <div class="modal-sheet">
+    <div class="modal-top">
+      <strong style="font-size: 1rem;">Add New Section</strong>
+      <button class="icon-btn" onclick="closeModal('section-modal')">Close</button>
+    </div>
+    <div class="sub-label">Section Title</div>
+    <input type="text" id="section-input-title" placeholder="e.g. Work &amp; Deadlines, Intimate Partner..." style="margin-top:0;" />
+    <button type="button" class="primary-btn" style="margin-top:14px;" onclick="saveSectionFromModal()">Create Section</button>
   </div>
 </div>
 
@@ -584,10 +807,9 @@
 <div class="modal" id="history-modal" onclick="closeModalOnBg(event, 'history-modal')">
   <div class="modal-sheet">
     <div class="modal-top">
-      <strong style="font-size: 1rem;">Saved Logs (Local Only)</strong>
+      <strong style="font-size: 1rem;">Reconsolidation Logs</strong>
       <button class="icon-btn" onclick="closeModal('history-modal')">Close</button>
     </div>
-    <button type="button" class="secondary-btn" style="margin-top:0; margin-bottom:12px;" onclick="exportAllMarkdown()">Copy All Logs as Markdown</button>
     <div id="history-list"></div>
   </div>
 </div>
@@ -652,161 +874,235 @@
   };
 
   const ANNOTATIONS = {
-    R1: "Background irritation (-1, 6)",
-    R2: "Noticeable alarm (-2, 7)",
-    R3: "Significant bracing (-3, 8)",
-    R4: "High threat spike (-4, 9)",
-    R5: "Full SAIC Redline (-5, 10)",
-    Y1: "Focus / Interest (+1, 6)",
-    Y2: "Engaged energy (+2, 7)",
-    Y3: "Drive / Momentum (+3, 8)",
-    Y4: "High activation (+4, 9)",
-    Y5: "Peak excitement (+5, 10)",
-    B1: "Quiet / Disengaged (-1, 4)",
-    B2: "Low / Flat (-2, 3)",
-    B3: "Heavy fatigue (-3, 2)",
-    B4: "Depleted (-4, 1)",
-    B5: "Shutdown / Collapse (-5, 0)",
-    G1: "Natural Ease (+1, 4)",
-    G2: "Settled (+2, 3)",
-    G3: "Grounded / Calm (+3, 2)",
-    G4: "Deep rest (+4, 1)",
-    G5: "Deep Absorption (+5, 0)"
+    R1: "Mild irritation / background brace (-1, 6)",
+    R2: "Moderate alarm / threat (-3, 8)",
+    R3: "High threat spike / SAIC redline (-5, 10)",
+    Y1: "Mild focus / interest (+1, 6)",
+    Y2: "Engaged drive (+3, 8)",
+    Y3: "Peak activation (+5, 10)",
+    B1: "Quiet / disengaged (-1, 4)",
+    B2: "Low energy / fatigue (-3, 2)",
+    B3: "Shutdown / freeze (-5, 0)",
+    G1: "Natural ease (+1, 4)",
+    G2: "Grounded / settled (+3, 2)",
+    G3: "Deep calm / rest (+5, 0)"
   };
 
-  const GUIDE_ENTRIES = [
-    // 1. TIP & Crisis Response
-    {
-      cat: "TIP & Crisis Response",
-      title: "Post-Call Looping: \"Things I wish I had said\"",
-      step1: "Interpersonal + Criticism / Correction + [Memory Loop]",
-      saic: "Agency (trying to retroactively fix/control their pain) + Identity (responder standard)",
-      reality: "Event is over, Adult now (Steady presence matters more than perfect phrasing; grief isn't solved by a sentence.)"
-    },
-    {
-      cat: "TIP & Crisis Response",
-      title: "Raw Scene Residue (Bodies, smells, sirens, intense emotion)",
-      step1: "Environmental + Sensory / Scene (+ [Memory Loop] if off-shift)",
-      saic: "Safety (autonomic threat echo) + Agency (witnessed tragedy you couldn't stop)",
-      reality: "Safe room, Event is over (I am off-shift, physically safe, and in my own home.)"
-    },
-    {
-      cat: "TIP & Crisis Response",
-      title: "Survivor's Story Hooking Personal History",
-      step1: "Personal + Sensory / Scene + [Memory Loop]",
-      saic: "Connection + Safety",
-      reality: "Adult now, Safe room (That is their crisis and old memory; my present life is intact.)"
-    },
-    // 2. Presentations, Social Dynamics & Relational Guilt
-    {
-      cat: "Presentations, Social Dynamics & Relational Guilt",
-      title: "Worrying I Hurt Someone's Feelings or Excluded Them (\"Did I say/do something wrong?\")",
-      step1: "Interpersonal (or Personal) + Criticism / Correction + [Memory Loop]",
-      saic: "Identity (fear of being thoughtless/harmful; failing own standard of care) + Connection (fear of relational fracture or rupture)",
-      reality: "Event is over, Old wiring ≠ Failure, Adult now (Hyper-vigilant mind-reading cannot rewrite interactions. If real repair is warranted, adult communication is direct; ruminative guilt is an old defense loop.)"
-    },
-    {
-      cat: "Presentations, Social Dynamics & Relational Guilt",
-      title: "Post-Presentation Looping (\"Wish I had said / not said\")",
-      step1: "Personal (or Interpersonal) + Criticism / Correction + [Memory Loop]",
-      saic: "Identity (exposed, imprecise, or short of own standard) + Connection (social standing)",
-      reality: "Event is over, Old wiring ≠ Failure (The room has already moved on; replaying a closed event cannot edit it.)"
-    },
-    {
-      cat: "Presentations, Social Dynamics & Relational Guilt",
-      title: "Receiving Feedback, Blame, or Scrutiny",
-      step1: "Interpersonal + Criticism / Correction",
-      saic: "Identity (flawed/inadequate) + Safety (status threat)",
-      reality: "Adult now, Old wiring ≠ Failure"
-    },
-    {
-      cat: "Presentations, Social Dynamics & Relational Guilt",
-      title: "Unanswered Message / Vague Plan / Waiting on Verdict",
-      step1: "Interpersonal + Silence / Ambiguity",
-      saic: "Connection (relational breach) + Agency (inability to prepare)",
-      reality: "Safe room, I have options"
-    },
-    // 3. Aging Parents, Dementia & Sibling Dynamics
-    {
-      cat: "Aging Parents, Dementia & Sibling Dynamics",
-      title: "Parent with Dementia (Repetition, confusion, resistance to care)",
-      step1: "Interpersonal + Plan / System Friction (or Boundary / Demand)",
-      saic: "Identity (forced role reversal: losing the child seat and becoming the parent's caretaker) + Agency (helpless to halt decline) + Connection (ambiguous loss of the parent you knew)",
-      reality: "Adult now, Event is over (Neurology is driving their behavior, not stubbornness. Stepping into the caretaker seat is a real role shift, not a personal failing.)"
-    },
-    {
-      cat: "Aging Parents, Dementia & Sibling Dynamics",
-      title: "Parent Health Scare / Medical Decline / ER Visit",
-      step1: "Interpersonal + Plan / System Friction (+ Fast Reflex if sudden)",
-      saic: "Safety (dissolution of the primal safety anchor; mortality) + Identity (stepping into the senior decision-maker role) + Agency (cannot fix biology)",
-      reality: "Safe room, Adult now, I have options (I am no longer a dependent child needing their protection to survive; I am a capable adult navigating reality.)"
-    },
-    {
-      cat: "Aging Parents, Dementia & Sibling Dynamics",
-      title: "Siblings Checked Out / Unequal Load / Second-Guessing You",
-      step1: "Interpersonal + Boundary / Demand (or Silence / Ambiguity)",
-      saic: "Agency (trapped carrying the load alone) + Identity (taken for granted / judged) + Connection",
-      reality: "I have options, Adult now (Their avoidance or differing capacity is not my moral failure.)"
-    },
-    {
-      cat: "Aging Parents, Dementia & Sibling Dynamics",
-      title: "Replaying a Tense Family Call or Care Decision Later",
-      step1: "Interpersonal + Criticism / Correction + [Memory Loop]",
-      saic: "Identity + Agency",
-      reality: "Safe room, Event is over"
-    },
-    // 4. Parenting & Kids' Challenges
-    {
-      cat: "Parenting & Kids' Challenges",
-      title: "Kids' Mental Health Challenges / Parental Self-Blame (\"Did I cause this by being reactive or angry in the past?\")",
-      step1: "Personal + Criticism / Correction + [Memory Loop] (or Interpersonal)",
-      saic: "Identity (omnipotent guilt: \"I broke them; a reactive or angry moment caused this\") + Agency (falsely assuming sole causal control over complex biology) + Connection + Safety",
-      reality: "Old wiring ≠ Failure, Adult now, Event is over (A child's mental health is complex, multi-factorial neurobiology and genetics—not caused by an imperfect reactive moment or snapped anger. Steady presence today is what matters; omnipotent self-blame is old guilt wiring.)"
-    },
-    {
-      cat: "Parenting & Kids' Challenges",
-      title: "Short Reply, Eye Roll, or Feeling Dismissed at Home (Note: Rarely an issue with kids—they communicate honestly—more applicable to external/work interactions or general home friction if it ever occurs)",
-      step1: "Interpersonal + Tone / Dismissal",
-      saic: "Connection (relational disconnect) + Identity (diminished)",
-      reality: "Event is over, Adult now"
-    },
-    // 5. World Events, Moral Outrage & Personal Meta-Loops
-    {
-      cat: "World Events, Moral Outrage & Personal Meta-Loops",
-      title: "Grotesque Injustice on the News (ICE, Gaza, Ukraine) — \"Calm = Complicity\"",
-      step1: "Environmental + Sensory / Scene",
-      saic: "Identity (moral integrity: \"if I'm calm, I don't care\") + Agency (helplessness at scale)",
-      reality: "Calm ≠ Complicity, Safe room (Physiological bracing in my living room does not help anyone; clarity preserves capacity.)"
-    },
-    {
-      cat: "World Events, Moral Outrage & Personal Meta-Loops",
-      title: "The \"Third Arrow\" (Chagrin at Getting Triggered So Hard)",
-      step1: "Personal + Criticism / Correction + [Memory Loop] + [Third Arrow]",
-      saic: "Identity (failing own standards of self-regulation)",
-      reality: "Old wiring ≠ Failure, Adult now (An automatic autonomic spike is old hardware firing, not a character flaw.)"
-    },
-    {
-      cat: "World Events, Moral Outrage & Personal Meta-Loops",
-      title: "Careless Mistake / Forgot Something / Broke Something",
-      step1: "Personal + Criticism / Correction",
-      saic: "Identity (incompetence) + Agency",
-      reality: "Old wiring ≠ Failure, Event is over"
-    },
-    {
-      cat: "World Events, Moral Outrage & Personal Meta-Loops",
-      title: "Own Fatigue, Brain Fog, or Unexplained Body Twinge",
-      step1: "Personal + Plan / System Friction (+ Fast Reflex if sharp)",
-      saic: "Safety (physical vulnerability) + Agency (loss of capacity)",
-      reality: "Safe room, I have options"
-    },
-    {
-      cat: "World Events, Moral Outrage & Personal Meta-Loops",
-      title: "Overwhelming To-Do List / Messy Space / Task Paralysis",
-      step1: "Personal + Boundary / Demand",
-      saic: "Agency (trapped/coerced by obligations)",
-      reality: "I have options, Adult now"
-    }
-  ];
+  const DEFAULT_ATLAS = {
+    sections: [
+      {
+        id: "sec-tip",
+        title: "TIP & Crisis Response",
+        patterns: [
+          {
+            id: "pat-tip-1",
+            title: "Post-Call Looping: \"Things I wish I had said\"",
+            domain: "Interpersonal",
+            pattern: "Criticism / Correction",
+            modifiers: ["Memory Loop"],
+            saic: ["Agency", "Identity"],
+            reality: "Event is over, Adult now (Steady presence matters more than perfect phrasing; grief isn't solved by a sentence.)",
+            notes: "Focus on steady presence rather than rehearsing retroactive fixes."
+          },
+          {
+            id: "pat-tip-2",
+            title: "Raw Scene Residue (Bodies, smells, sirens, intense emotion)",
+            domain: "Environmental",
+            pattern: "Sensory / Scene",
+            modifiers: ["Memory Loop"],
+            saic: ["Safety", "Agency"],
+            reality: "Safe room, Event is over (I am off-shift, physically safe, and in my own home.)",
+            notes: "Autonomic threat echo from high-acuity scene residue."
+          },
+          {
+            id: "pat-tip-3",
+            title: "Survivor's Story Hooking Personal History",
+            domain: "Personal",
+            pattern: "Sensory / Scene",
+            modifiers: ["Memory Loop"],
+            saic: ["Connection", "Safety"],
+            reality: "Adult now, Safe room (That is their crisis and old memory; my present life is intact.)",
+            notes: "Separate survivor's crisis and old memory from present safety."
+          }
+        ]
+      },
+      {
+        id: "sec-work",
+        title: "Presentations, Social Dynamics & Relational Guilt",
+        patterns: [
+          {
+            id: "pat-work-1",
+            title: "Worrying I Hurt Someone's Feelings or Excluded Them (\"Did I say/do something wrong?\")",
+            domain: "Interpersonal",
+            pattern: "Criticism / Correction",
+            modifiers: ["Memory Loop"],
+            saic: ["Identity", "Connection"],
+            reality: "Event is over, Old wiring ≠ Failure, Adult now (Hyper-vigilant mind-reading cannot rewrite interactions. If real repair is warranted, adult communication is direct; ruminative guilt is an old defense loop.)",
+            notes: "Primary personal loop. Check in directly if warranted; otherwise disengage from mind-reading."
+          },
+          {
+            id: "pat-work-2",
+            title: "Post-Presentation Looping (\"Wish I had said / not said\")",
+            domain: "Personal",
+            pattern: "Criticism / Correction",
+            modifiers: ["Memory Loop"],
+            saic: ["Identity", "Connection"],
+            reality: "Event is over, Old wiring ≠ Failure (The room has already moved on; replaying a closed event cannot edit it.)",
+            notes: "The room has moved on. Replaying cannot edit past events."
+          },
+          {
+            id: "pat-work-3",
+            title: "Receiving Feedback, Blame, or Scrutiny",
+            domain: "Interpersonal",
+            pattern: "Criticism / Correction",
+            modifiers: [],
+            saic: ["Identity", "Safety"],
+            reality: "Adult now, Old wiring ≠ Failure",
+            notes: "Status threat response; ground in adult standing."
+          },
+          {
+            id: "pat-work-4",
+            title: "Unanswered Message / Vague Plan / Waiting on Verdict",
+            domain: "Interpersonal",
+            pattern: "Silence / Ambiguity",
+            modifiers: [],
+            saic: ["Connection", "Agency"],
+            reality: "Safe room, I have options",
+            notes: "Tolerance of relational ambiguity without catastrophic projection."
+          }
+        ]
+      },
+      {
+        id: "sec-parents",
+        title: "Aging Parents, Dementia & Sibling Dynamics",
+        patterns: [
+          {
+            id: "pat-parent-1",
+            title: "Parent with Dementia (Repetition, confusion, resistance to care)",
+            domain: "Interpersonal",
+            pattern: "Plan / System Friction",
+            modifiers: [],
+            saic: ["Identity", "Agency", "Connection"],
+            reality: "Adult now, Event is over (Neurology is driving their behavior, not stubbornness. Stepping into the caretaker seat is a real role shift, not a personal failing.)",
+            notes: "Forced role reversal: losing the child seat and becoming the parent's caretaker."
+          },
+          {
+            id: "pat-parent-2",
+            title: "Parent Health Scare / Medical Decline / ER Visit",
+            domain: "Interpersonal",
+            pattern: "Plan / System Friction",
+            modifiers: ["+ Fast Reflex"],
+            saic: ["Safety", "Identity", "Agency"],
+            reality: "Safe room, Adult now, I have options (I am no longer a dependent child needing their protection to survive; I am a capable adult navigating reality.)",
+            notes: "Dissolution of primal safety anchor; ground in capable adult presence."
+          },
+          {
+            id: "pat-parent-3",
+            title: "Siblings Checked Out / Unequal Load / Second-Guessing You",
+            domain: "Interpersonal",
+            pattern: "Boundary / Demand",
+            modifiers: [],
+            saic: ["Agency", "Identity", "Connection"],
+            reality: "I have options, Adult now (Their avoidance or differing capacity is not my moral failure.)",
+            notes: "Differing capacity or avoidance is not a moral referendum on you."
+          },
+          {
+            id: "pat-parent-4",
+            title: "Replaying a Tense Family Call or Care Decision Later",
+            domain: "Interpersonal",
+            pattern: "Criticism / Correction",
+            modifiers: ["Memory Loop"],
+            saic: ["Identity", "Agency"],
+            reality: "Safe room, Event is over",
+            notes: "Post-call decision replay loop."
+          }
+        ]
+      },
+      {
+        id: "sec-kids",
+        title: "Parenting & Kids' Challenges",
+        patterns: [
+          {
+            id: "pat-kid-1",
+            title: "Kids' Mental Health Challenges / Parental Self-Blame (\"Did I cause this by being reactive or angry in the past?\")",
+            domain: "Personal",
+            pattern: "Criticism / Correction",
+            modifiers: ["Memory Loop"],
+            saic: ["Identity", "Agency", "Connection", "Safety"],
+            reality: "Old wiring ≠ Failure, Adult now, Event is over (A child's mental health is complex, multi-factorial neurobiology and genetics—not caused by an imperfect reactive moment or snapped anger. Steady presence today is what matters; omnipotent self-blame is old guilt wiring.)",
+            notes: "Omnipotent self-blame assuming past snapped anger caused their struggle. Steady presence today is real."
+          },
+          {
+            id: "pat-kid-2",
+            title: "Short Reply, Eye Roll, or Feeling Dismissed at Home (Note: Rarely an issue with kids—they communicate honestly—more applicable to external/work interactions or general home friction if it ever occurs)",
+            domain: "Interpersonal",
+            pattern: "Tone / Dismissal",
+            modifiers: [],
+            saic: ["Connection", "Identity"],
+            reality: "Event is over, Adult now",
+            notes: "Rarely an issue with kids; communicate honestly."
+          }
+        ]
+      },
+      {
+        id: "sec-world",
+        title: "World Events, Moral Outrage & Personal Meta-Loops",
+        patterns: [
+          {
+            id: "pat-world-1",
+            title: "Grotesque Injustice on the News (ICE, Gaza, Ukraine) — \"Calm = Complicity\"",
+            domain: "Environmental",
+            pattern: "Sensory / Scene",
+            modifiers: [],
+            saic: ["Identity", "Agency"],
+            reality: "Calm ≠ Complicity, Safe room (Physiological bracing in my living room does not help anyone; clarity preserves capacity.)",
+            notes: "Bracing in living room does not assist victims; regulation preserves actual capacity."
+          },
+          {
+            id: "pat-world-2",
+            title: "The \"Third Arrow\" (Chagrin at Getting Triggered So Hard)",
+            domain: "Personal",
+            pattern: "Criticism / Correction",
+            modifiers: ["Memory Loop", "Third Arrow"],
+            saic: ["Identity"],
+            reality: "Old wiring ≠ Failure, Adult now (An automatic autonomic spike is old hardware firing, not a character flaw.)",
+            notes: "Autonomic spike is hardware reflex, not moral inadequacy."
+          },
+          {
+            id: "pat-world-3",
+            title: "Careless Mistake / Forgot Something / Broke Something",
+            domain: "Personal",
+            pattern: "Criticism / Correction",
+            modifiers: [],
+            saic: ["Identity", "Agency"],
+            reality: "Old wiring ≠ Failure, Event is over",
+            notes: "Internalized incompetence loop."
+          },
+          {
+            id: "pat-world-4",
+            title: "Own Fatigue, Brain Fog, or Unexplained Body Twinge",
+            domain: "Personal",
+            pattern: "Plan / System Friction",
+            modifiers: ["+ Fast Reflex"],
+            saic: ["Safety", "Agency"],
+            reality: "Safe room, I have options",
+            notes: "Somatic vulnerability triggering physical alarm."
+          },
+          {
+            id: "pat-world-5",
+            title: "Overwhelming To-Do List / Messy Space / Task Paralysis",
+            domain: "Personal",
+            pattern: "Boundary / Demand",
+            modifiers: [],
+            saic: ["Agency"],
+            reality: "I have options, Adult now",
+            notes: "Task paralysis from coercive demands; ground in autonomy."
+          }
+        ]
+      }
+    ],
+    globalConclusions: "Long-term synthesis and meta-observations across recurring patterns:\n- High-acuity spikes consistently trace back to Identity + Connection (fear of having caused harm, being exclusionary, or being inadequate).\n- Omnipotent parental responsibility falsely attributes multi-factorial neurobiology to momentary parenting imperfections.\n- Somatic bracing never resolves external crises; baseline calm is required before operant agency can be exercised."
+  };
 
   // --- SESSION STATE ---
   let state = createFreshState();
@@ -835,8 +1131,349 @@
     };
   }
 
+  // --- ATLAS STATE & STORAGE ---
+  const ATLAS_STORAGE_KEY = "somatic_refactor_atlas";
+  let atlas = loadAtlas();
+  let editingPatternModal = null; // { secId, patId }
+  let modalPatternState = {};
+
+  function loadAtlas() {
+    try {
+      const saved = localStorage.getItem(ATLAS_STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch(e) {}
+    return JSON.parse(JSON.stringify(DEFAULT_ATLAS));
+  }
+
+  function saveAtlas() {
+    localStorage.setItem(ATLAS_STORAGE_KEY, JSON.stringify(atlas));
+  }
+
+  function saveGlobalConclusions() {
+    const el = document.getElementById("global-conclusions-text");
+    if (el) {
+      atlas.globalConclusions = el.value;
+      saveAtlas();
+    }
+  }
+
+  function filterAtlas() {
+    renderAtlas();
+  }
+
+  function renderAtlas() {
+    const q = (document.getElementById("atlas-search")?.value || "").toLowerCase().trim();
+    const container = document.getElementById("sections-container");
+    if (!container) return;
+    container.innerHTML = "";
+
+    atlas.sections.forEach(sec => {
+      const filteredPatterns = sec.patterns.filter(p => {
+        if (!q) return true;
+        const searchStr = `${p.title} ${p.domain} ${p.pattern} ${p.modifiers.join(" ")} ${p.saic.join(" ")} ${p.reality} ${p.notes || ""}`.toLowerCase();
+        return searchStr.includes(q);
+      });
+
+      if (q && filteredPatterns.length === 0) return;
+
+      const secEl = document.createElement("div");
+      secEl.className = "section-card";
+
+      const header = document.createElement("div");
+      header.className = "section-header";
+      header.innerHTML = `
+        <div class="section-title">
+          <span>${sec.title}</span>
+          <span class="step-badge">${filteredPatterns.length}</span>
+        </div>
+        <div class="section-actions">
+          <button type="button" class="icon-btn" onclick="openPatternModal('${sec.id}')">+ Pattern</button>
+          <button type="button" class="danger-btn" title="Delete section" onclick="deleteSection('${sec.id}')">✕</button>
+        </div>
+      `;
+      secEl.appendChild(header);
+
+      if (filteredPatterns.length === 0) {
+        const empty = document.createElement("p");
+        empty.style.color = "var(--muted)";
+        empty.style.fontSize = "0.85rem";
+        empty.style.margin = "4px 0";
+        empty.textContent = "No patterns in this section yet. Tap + Pattern to add one.";
+        secEl.appendChild(empty);
+      } else {
+        filteredPatterns.forEach(pat => {
+          const patEl = document.createElement("div");
+          patEl.className = "pattern-card";
+
+          const modTags = pat.modifiers.map(m => `<span class="pattern-tag modifier">${m}</span>`).join("");
+          const saicTags = pat.saic.map(s => `<span class="pattern-tag saic">${s}</span>`).join("");
+          const notesHtml = pat.notes ? `<div class="pattern-notes">Note: ${pat.notes}</div>` : "";
+
+          patEl.innerHTML = `
+            <div class="pattern-header">
+              <div class="pattern-title">${pat.title}</div>
+              <div class="pattern-actions">
+                <button type="button" class="run-btn" onclick="runPassForPattern('${sec.id}', '${pat.id}')">▶ Run Pass</button>
+                <button type="button" class="icon-btn" style="padding:4px 8px; font-size:0.78rem;" onclick="openPatternModal('${sec.id}', '${pat.id}')">✎</button>
+                <button type="button" class="danger-btn" title="Delete pattern" onclick="deletePattern('${sec.id}', '${pat.id}')">✕</button>
+              </div>
+            </div>
+            <div class="pattern-tags">
+              <span class="pattern-tag source">${pat.domain} · ${pat.pattern}</span>
+              ${modTags}
+              ${saicTags}
+            </div>
+            <div class="pattern-reality"><b>Reality:</b> ${pat.reality}</div>
+            ${notesHtml}
+          `;
+          secEl.appendChild(patEl);
+        });
+      }
+
+      container.appendChild(secEl);
+    });
+
+    const conclusionsEl = document.getElementById("global-conclusions-text");
+    if (conclusionsEl && document.activeElement !== conclusionsEl) {
+      conclusionsEl.value = atlas.globalConclusions || "";
+    }
+  }
+
+  function openSectionModal() {
+    document.getElementById("section-input-title").value = "";
+    openModal("section-modal");
+  }
+
+  function saveSectionFromModal() {
+    const title = document.getElementById("section-input-title").value.trim();
+    if (!title) return;
+    atlas.sections.push({
+      id: "sec-" + Date.now(),
+      title,
+      patterns: []
+    });
+    saveAtlas();
+    closeModal("section-modal");
+    renderAtlas();
+    showToast("Section created");
+  }
+
+  function deleteSection(secId) {
+    const sec = atlas.sections.find(s => s.id === secId);
+    if (!sec) return;
+    if (confirm(`Delete section "${sec.title}" and all its patterns?`)) {
+      atlas.sections = atlas.sections.filter(s => s.id !== secId);
+      saveAtlas();
+      renderAtlas();
+      showToast("Section deleted");
+    }
+  }
+
+  function openPatternModal(secId, patId) {
+    editingPatternModal = { secId, patId: patId || null };
+    const secSelect = document.getElementById("pattern-input-section");
+    secSelect.innerHTML = "";
+    atlas.sections.forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s.id;
+      opt.textContent = s.title;
+      if (s.id === secId) opt.selected = true;
+      secSelect.appendChild(opt);
+    });
+
+    const heading = document.getElementById("pattern-modal-heading");
+    let initialPattern = {
+      title: "",
+      domain: "Interpersonal",
+      pattern: "Tone / Dismissal",
+      modifiers: [],
+      saic: ["Connection"],
+      reality: "",
+      notes: ""
+    };
+
+    if (patId) {
+      const sec = atlas.sections.find(s => s.id === secId);
+      const existing = sec?.patterns.find(p => p.id === patId);
+      if (existing) {
+        initialPattern = JSON.parse(JSON.stringify(existing));
+        heading.textContent = "Edit Pattern";
+      }
+    } else {
+      heading.textContent = "Add New Pattern";
+    }
+
+    document.getElementById("pattern-input-title").value = initialPattern.title;
+    document.getElementById("pattern-input-reality").value = initialPattern.reality;
+    document.getElementById("pattern-input-notes").value = initialPattern.notes || "";
+
+    renderModalSingleChips("pattern-modal-domain", DOMAINS, initialPattern, "domain");
+    renderModalSingleChips("pattern-modal-pattern", PATTERNS, initialPattern, "pattern");
+    renderModalMultiChips("pattern-modal-modifiers", MODIFIERS, initialPattern, "modifiers", "warn");
+    renderModalMultiChips("pattern-modal-saic", Object.keys(SAIC_DATA), initialPattern, "saic", "saic-chip");
+
+    openModal("pattern-modal");
+  }
+
+  function renderModalSingleChips(containerId, items, obj, key) {
+    modalPatternState[key] = obj[key] || items[0];
+    const el = document.getElementById(containerId);
+    el.innerHTML = "";
+    items.forEach(item => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "chip" + (modalPatternState[key] === item ? " active" : "");
+      btn.textContent = item;
+      btn.onclick = () => {
+        modalPatternState[key] = item;
+        renderModalSingleChips(containerId, items, modalPatternState, key);
+      };
+      el.appendChild(btn);
+    });
+  }
+
+  function renderModalMultiChips(containerId, items, obj, key, extraClass = "") {
+    modalPatternState[key] = obj[key] ? [...obj[key]] : [];
+    const el = document.getElementById(containerId);
+    el.innerHTML = "";
+    items.forEach(item => {
+      const active = modalPatternState[key].includes(item);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `chip ${extraClass} ${active ? "active" : ""}`.trim();
+      btn.textContent = item;
+      btn.onclick = () => {
+        if (active) {
+          modalPatternState[key] = modalPatternState[key].filter(x => x !== item);
+        } else {
+          modalPatternState[key].push(item);
+        }
+        renderModalMultiChips(containerId, items, modalPatternState, key, extraClass);
+      };
+      el.appendChild(btn);
+    });
+  }
+
+  function savePatternFromModal() {
+    const title = document.getElementById("pattern-input-title").value.trim();
+    if (!title) {
+      alert("Please enter a pattern title.");
+      return;
+    }
+    const targetSecId = document.getElementById("pattern-input-section").value;
+    const reality = document.getElementById("pattern-input-reality").value.trim();
+    const notes = document.getElementById("pattern-input-notes").value.trim();
+
+    const patternData = {
+      id: editingPatternModal?.patId || ("pat-" + Date.now()),
+      title,
+      domain: modalPatternState.domain || "Interpersonal",
+      pattern: modalPatternState.pattern || "Tone / Dismissal",
+      modifiers: modalPatternState.modifiers || [],
+      saic: modalPatternState.saic.length ? modalPatternState.saic : ["Safety"],
+      reality: reality || "Adult now, Event is over",
+      notes
+    };
+
+    if (editingPatternModal?.patId) {
+      const origSec = atlas.sections.find(s => s.id === editingPatternModal.secId);
+      if (origSec) {
+        origSec.patterns = origSec.patterns.filter(p => p.id !== editingPatternModal.patId);
+      }
+    }
+
+    const destSec = atlas.sections.find(s => s.id === targetSecId);
+    if (destSec) {
+      destSec.patterns.push(patternData);
+    }
+
+    saveAtlas();
+    closeModal("pattern-modal");
+    renderAtlas();
+    showToast("Pattern saved");
+  }
+
+  function deletePattern(secId, patId) {
+    const sec = atlas.sections.find(s => s.id === secId);
+    if (!sec) return;
+    const pat = sec.patterns.find(p => p.id === patId);
+    if (!pat) return;
+    if (confirm(`Delete pattern "${pat.title}"?`)) {
+      sec.patterns = sec.patterns.filter(p => p.id !== patId);
+      saveAtlas();
+      renderAtlas();
+      showToast("Pattern deleted");
+    }
+  }
+
+  // --- RECONSOLIDATION PASS RUNNER ---
+  function runPassForPattern(secId, patId) {
+    const sec = atlas.sections.find(s => s.id === secId);
+    const pat = sec?.patterns.find(p => p.id === patId);
+    if (!pat) return;
+
+    state = createFreshState();
+    state.domain = pat.domain;
+    state.pattern = pat.pattern;
+    state.modifiers = [...pat.modifiers];
+    state.saic = [...pat.saic];
+    state.realities = [pat.reality];
+
+    document.getElementById("facts-note").value = "";
+    document.getElementById("assumption-note").value = "";
+    document.getElementById("reality-note").value = pat.reality;
+    document.getElementById("workflow-active-title").textContent = pat.title;
+
+    renderSingleChips("domain-chips", DOMAINS, "domain", updateStep1Badge);
+    renderSingleChips("pattern-chips", PATTERNS, "pattern", updateStep1Badge);
+    renderMultiChips("modifier-chips", MODIFIERS, "modifiers", "warn", updateStep1Badge);
+    updateStep1Badge();
+
+    renderMultiChips("saic-chips", Object.keys(SAIC_DATA), "saic", "saic-chip", renderSaicHints);
+    renderSaicHints();
+
+    renderMultiChips("reality-chips", REALITIES, "realities", "green-chip");
+    renderChargeStrip();
+
+    document.getElementById("atlas-view").style.display = "none";
+    document.getElementById("workflow-view").style.display = "block";
+    window.scrollTo(0, 0);
+  }
+
+  function startScratchpadPass() {
+    state = createFreshState();
+    document.getElementById("facts-note").value = "";
+    document.getElementById("assumption-note").value = "";
+    document.getElementById("reality-note").value = "";
+    document.getElementById("workflow-active-title").textContent = "Blank Reconsolidation Pass";
+
+    renderSingleChips("domain-chips", DOMAINS, "domain", updateStep1Badge);
+    renderSingleChips("pattern-chips", PATTERNS, "pattern", updateStep1Badge);
+    renderMultiChips("modifier-chips", MODIFIERS, "modifiers", "warn", updateStep1Badge);
+    updateStep1Badge();
+
+    renderMultiChips("saic-chips", Object.keys(SAIC_DATA), "saic", "saic-chip", renderSaicHints);
+    renderSaicHints();
+
+    renderMultiChips("reality-chips", REALITIES, "realities", "green-chip");
+    renderChargeStrip();
+
+    document.getElementById("atlas-view").style.display = "none";
+    document.getElementById("workflow-view").style.display = "block";
+    window.scrollTo(0, 0);
+  }
+
+  function returnToAtlas() {
+    document.getElementById("workflow-view").style.display = "none";
+    document.getElementById("atlas-view").style.display = "block";
+    renderAtlas();
+    window.scrollTo(0, 0);
+  }
+
   // --- INITIALIZATION ---
   function init() {
+    renderAtlas();
+
     renderSingleChips("domain-chips", DOMAINS, "domain", updateStep1Badge);
     renderSingleChips("pattern-chips", PATTERNS, "pattern", updateStep1Badge);
     renderMultiChips("modifier-chips", MODIFIERS, "modifiers", "warn", updateStep1Badge);
@@ -856,7 +1493,6 @@
     renderTarget("target-code3", "code3");
     renderMultiChips("release-chips", RELEASES, "releases", "green-chip");
 
-    renderGuide();
     updateLogCount();
     updateTelemetry();
   }
@@ -947,18 +1583,19 @@
     });
   }
 
-  // --- 4-QUADRANT x 5-RING SVG TARGET ---
+  // --- 4-QUADRANT x 3-RING SVG TARGET ---
   // Top-Left: Red (Neg Valence, High Arousal)
   // Top-Right: Yellow (Pos Valence, High Arousal)
   // Bottom-Left: Blue (Neg Valence, Low Arousal)
   // Bottom-Right: Green (Pos Valence, Low Arousal)
   function renderTarget(containerId, stateKey) {
     const container = document.getElementById(containerId);
+    if (!container) return;
     const size = 280;
     const cx = size / 2;
     const cy = size / 2;
     const maxR = 128;
-    const ringStep = maxR / 5;
+    const ringStep = maxR / 3;
 
     const quadrants = [
       { code: "R", startAngle: 180, endAngle: 270, base: "#f85149" },
@@ -969,11 +1606,11 @@
 
     let svg = `<svg viewBox="0 0 ${size} ${size}" class="target-svg">`;
 
-    // Draw outer to inner rings so inner clicks layer cleanly on top
-    for (let ring = 5; ring >= 1; ring--) {
+    // Draw outer to inner rings (3 down to 1)
+    for (let ring = 3; ring >= 1; ring--) {
       const rOuter = ring * ringStep;
       const rInner = (ring - 1) * ringStep;
-      const opacity = 0.16 + ring * 0.13;
+      const opacity = 0.2 + ring * 0.25;
 
       quadrants.forEach(q => {
         const fullCode = `${q.code}${ring}`;
@@ -990,7 +1627,7 @@
         const ly = cy + midR * Math.sin(midAngle);
 
         svg += `<path d="${d}" fill="${q.base}" fill-opacity="${fillOpacity}" stroke="${stroke}" stroke-width="${strokeWidth}" class="wedge" onclick="selectCode('${stateKey}', '${fullCode}')"></path>`;
-        svg += `<text x="${lx}" y="${ly}" fill="#ffffff" font-size="10" font-weight="${isSelected ? '800' : '600'}" text-anchor="middle" dominant-baseline="central" pointer-events="none">${fullCode}</text>`;
+        svg += `<text x="${lx}" y="${ly}" fill="#ffffff" font-size="11" font-weight="${isSelected ? '800' : '600'}" text-anchor="middle" dominant-baseline="central" pointer-events="none">${fullCode}</text>`;
       });
     }
 
@@ -1029,10 +1666,12 @@
     if (stateKey === "code3") state.tCode3 = now;
 
     renderTarget(`target-${stateKey}`, stateKey);
-    document.getElementById(`${stateKey}-badge`).textContent = code;
-    document.getElementById(`readout-${stateKey}`).textContent = `${code}: ${ANNOTATIONS[code] || ""}`;
+    const badge = document.getElementById(`${stateKey}-badge`);
+    if (badge) badge.textContent = code;
+    const readout = document.getElementById(`readout-${stateKey}`);
+    if (readout) readout.textContent = `${code}: ${ANNOTATIONS[code] || ""}`;
 
-    if (stateKey === "code1" && (code === "R4" || code === "R5")) {
+    if (stateKey === "code1" && code === "R3") {
       document.getElementById("charge-alert").style.display = "block";
     }
     updateTelemetry();
@@ -1109,72 +1748,38 @@ process: "${processStr}"
     };
     const isoDate = new Date().toISOString();
     const processStr = buildProcessString();
+    const activeTitle = document.getElementById("workflow-active-title")?.textContent || "Pass";
     const md = compileMarkdown(snapshot, isoDate, processStr);
     lastSavedMarkdown = md;
 
     const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
-    logs.unshift({ id: isoDate, process: processStr, trigger: `${snapshot.domain} · ${snapshot.pattern}`, md });
+    logs.unshift({ id: isoDate, process: processStr, trigger: `${activeTitle} (${snapshot.domain || "—"} · ${snapshot.pattern || "—"})`, md });
     localStorage.setItem("somatic_refactor_logs", JSON.stringify(logs));
     updateLogCount();
 
-    copyText(md);
-    document.getElementById("final-telemetry").textContent = processStr;
-    document.getElementById("workflow").style.display = "none";
-    document.getElementById("rest-screen").style.display = "block";
-    window.scrollTo(0, 0);
+    showToast("Reconsolidation pass saved!");
   }
 
-  function copyLastMarkdown() {
-    if (lastSavedMarkdown) copyText(lastSavedMarkdown);
-  }
-
-  function resetSession() {
-    state = createFreshState();
-    document.getElementById("facts-note").value = "";
-    document.getElementById("assumption-note").value = "";
-    document.getElementById("reality-note").value = "";
-    document.getElementById("charge-alert").style.display = "none";
-    document.getElementById("step1-badge").textContent = "Select source";
-    document.getElementById("code1-badge").textContent = "Tap target";
-    document.getElementById("code2-badge").textContent = "Optional mid-code";
-    document.getElementById("code3-badge").textContent = "Tap final state";
-    document.getElementById("saic-badge").textContent = "Multi-select";
-    document.getElementById("saic-hints").innerHTML = "";
-    document.querySelectorAll("#loop-segmented .seg-btn").forEach(b => {
-      b.classList.toggle("active", b.dataset.val === "few");
+  function exportAtlasMarkdown() {
+    let out = "# Somatic Refactor: Personal Field Guide & Trigger Map\n\n";
+    atlas.sections.forEach((sec, idx) => {
+      out += `## ${idx + 1}. ${sec.title}\n\n`;
+      out += "| Recurring Scenario | Step 1: Domain & Pattern | Step 3: SAIC Threats | Step 4: Reality Anchor |\n";
+      out += "| :--- | :--- | :--- | :--- |\n";
+      sec.patterns.forEach(p => {
+        const mods = p.modifiers.length ? ` + [${p.modifiers.join(", ")}]` : "";
+        const saicStr = p.saic.join(" + ");
+        const notesStr = p.notes ? ` *(${p.notes})*` : "";
+        out += `| **${p.title}** | \`${p.domain}\` + \`${p.pattern}\`${mods} | **${saicStr}** | ${p.reality}${notesStr} |\n`;
+      });
+      out += "\n---\n\n";
     });
-    init();
-    document.getElementById("rest-screen").style.display = "none";
-    document.getElementById("workflow").style.display = "flex";
-    window.scrollTo(0, 0);
-  }
-
-  // --- FIELD GUIDE & HISTORY MODALS ---
-  function renderGuide() {
-    const q = (document.getElementById("guide-search").value || "").toLowerCase();
-    const list = document.getElementById("guide-list");
-    list.innerHTML = "";
-    GUIDE_ENTRIES.filter(item =>
-      !q ||
-      item.title.toLowerCase().includes(q) ||
-      item.cat.toLowerCase().includes(q) ||
-      item.step1.toLowerCase().includes(q) ||
-      item.saic.toLowerCase().includes(q) ||
-      item.reality.toLowerCase().includes(q)
-    ).forEach(item => {
-      const div = document.createElement("div");
-      div.className = "guide-item";
-      div.innerHTML = `
-        <div style="font-size:0.74rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;">${item.cat}</div>
-        <div class="guide-title">${item.title}</div>
-        <div class="guide-meta">
-          <span>Step 1:</span> ${item.step1}<br>
-          <b>SAIC:</b> ${item.saic}<br>
-          <em>Reality:</em> ${item.reality}
-        </div>
-      `;
-      list.appendChild(div);
-    });
+    if (atlas.globalConclusions) {
+      out += "## Global Conclusions & Meta-Observations\n\n";
+      out += atlas.globalConclusions + "\n";
+    }
+    copyText(out);
+    showToast("Exported Field Guide to clipboard");
   }
 
   function updateLogCount() {
@@ -1190,24 +1795,30 @@ process: "${processStr}"
       const div = document.createElement("div");
       div.className = "guide-item";
       div.innerHTML = `
-        <div class="guide-title">${log.id.slice(0, 10)} — ${log.trigger}</div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+          <div class="guide-title">${log.id.slice(0, 10)} — ${log.trigger}</div>
+          <button type="button" class="danger-btn" onclick="deleteLogIndex(${idx})" title="Delete">✕</button>
+        </div>
         <div class="guide-meta" style="font-family:monospace; margin-bottom:8px;">${log.process}</div>
-        <button class="icon-btn" onclick="copyLogIndex(${idx})">Copy Markdown</button>
+        <button class="icon-btn" onclick="copyLogIndex(${idx})">Copy Log</button>
       `;
       list.appendChild(div);
     });
     openModal("history-modal");
   }
 
+  function deleteLogIndex(idx) {
+    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
+    logs.splice(idx, 1);
+    localStorage.setItem("somatic_refactor_logs", JSON.stringify(logs));
+    updateLogCount();
+    openHistory();
+    showToast("Log deleted");
+  }
+
   function copyLogIndex(idx) {
     const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
     if (logs[idx]) copyText(logs[idx].md);
-  }
-
-  function exportAllMarkdown() {
-    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
-    if (!logs.length) return;
-    copyText(logs.map(l => l.md).join("\n---\n\n"));
   }
 
   function openModal(id) { document.getElementById(id).classList.add("open"); }

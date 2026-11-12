@@ -603,190 +603,71 @@
 <body>
 
 <header>
-  <div class="gate-banner">Are you calm enough?</div>
+  <div class="header-branding">
+    <div class="app-title">Personal Field Guide</div>
+    <div class="gate-banner">Are you calm enough?</div>
+  </div>
   <div class="header-actions">
-    <button class="icon-btn" onclick="exportAtlasMarkdown()">Export Guide</button>
-    <button class="icon-btn" onclick="openHistory()">Logs (<span id="log-count">0</span>)</button>
+    <button type="button" class="icon-btn" onclick="exportAtlasMarkdown()">Export Guide</button>
+    <button type="button" class="icon-btn primary" onclick="openSectionModal()">+ Section</button>
   </div>
 </header>
 
 <main>
+  <div class="search-bar-wrap">
+    <input type="text" id="atlas-search" class="search-input" placeholder="Filter triggers, threats, reality anchors, or notes..." oninput="filterAtlas()" />
+    <button type="button" class="clear-search-btn" id="clear-search-btn" onclick="clearSearch()" style="display:none;">✕</button>
+  </div>
 
-  <!-- VIEW 1: PATTERN ATLAS (PRIMARY HOME VIEW) -->
-  <section id="atlas-view">
-    <div class="atlas-controls">
-      <input type="text" id="atlas-search" class="atlas-search" placeholder="Filter patterns, SAIC, or notes..." oninput="filterAtlas()" />
-      <button type="button" class="icon-btn" onclick="openSectionModal()">+ Section</button>
-      <button type="button" class="icon-btn" style="border-color:var(--green); color:var(--green);" onclick="startScratchpadPass()">+ Blank Pass</button>
+  <div id="sections-container"></div>
+
+  <div class="conclusions-card">
+    <div class="conclusions-header">
+      <div class="conclusions-title">📝 Global Conclusions &amp; Meta-Observations</div>
+      <span class="status-pill">Auto-Saved</span>
     </div>
-
-    <!-- SECTIONS & PATTERN CARDS INJECTED HERE -->
-    <div id="sections-container"></div>
-
-    <!-- GLOBAL CONCLUSIONS NOTEBOOK -->
-    <div class="card global-conclusions-box">
-      <div class="step-header">
-        <span class="step-title">📝 Global Conclusions &amp; Synthesis</span>
-        <span class="step-badge" style="color:var(--green);">Auto-Saved</span>
-      </div>
-      <p style="font-size:0.82rem; color:var(--muted); margin:0 0 8px;">
-        High-level observations, systemic insights, and evolving truths across your patterns.
-      </p>
-      <textarea id="global-conclusions-text" rows="5" placeholder="Document meta-observations across your recurring loops..." oninput="saveGlobalConclusions()"></textarea>
-    </div>
-  </section>
-
-  <!-- VIEW 2: RAPID RECONSOLIDATION PASS -->
-  <section id="workflow-view" style="display:none;">
-    <div class="nav-bar">
-      <button type="button" class="nav-back-btn" onclick="returnToAtlas()">← Back to Atlas</button>
-      <div id="workflow-active-title" style="font-weight:700; font-size:0.88rem; color:#fff; text-align:right;"></div>
-    </div>
-
-  <!-- STEP 1: BARE FACTS -->
-  <section class="card">
-    <div class="step-header">
-      <span class="step-title">1. Bare Facts (Silent Video)</span>
-      <span class="step-badge" id="step1-badge">Select source</span>
-    </div>
-
-    <div class="sub-label">Domain</div>
-    <div class="chip-row" id="domain-chips"></div>
-
-    <div class="sub-label">Pattern</div>
-    <div class="chip-row" id="pattern-chips"></div>
-
-    <div class="sub-label">Modifiers</div>
-    <div class="chip-row" id="modifier-chips"></div>
-
-    <input type="text" id="facts-note" placeholder="Optional 1-line objective fact (no motive guessing)..." />
-  </section>
-
-  <!-- STEP 2: BODY SNAPSHOT & CODE 1 -->
-  <section class="card">
-    <div class="step-header">
-      <span class="step-title">2. Body Snapshot (Code 1)</span>
-      <span class="step-badge" id="code1-badge">Tap target</span>
-    </div>
-
-    <div class="target-wrap" id="target-code1"></div>
-    <div class="target-readout" id="readout-code1">Red: High Arousal / Neg • Yellow: High / Pos • Blue: Low / Neg • Green: Low / Pos</div>
-
-    <div class="sub-label">Sensation</div>
-    <div class="chip-row" id="sensation-chips"></div>
-
-    <div class="sub-label">Location</div>
-    <div class="chip-row" id="location-chips"></div>
-
-    <div class="sub-label">Knot Charge (Workable window: 3–5)</div>
-    <div class="charge-strip" id="charge-strip"></div>
-    <div class="alert-box" id="charge-alert">
-      Charge &gt; 5 is too hot for reconsolidation. Step away, regulate (breathe, cool water, feel feet), and return once settled into 3–5.
-    </div>
-  </section>
-
-  <!-- STEP 3: SYSTEM ASSUMPTION & SAIC -->
-  <section class="card">
-    <div class="step-header">
-      <span class="step-title">3. System Assumption &amp; SAIC</span>
-      <span class="step-badge" id="saic-badge">Multi-select</span>
-    </div>
-
-    <div class="chip-row" id="saic-chips"></div>
-    <div class="saic-hints" id="saic-hints"></div>
-
-    <input type="text" id="assumption-note" placeholder="Optional: My system assumed..." />
-  </section>
-
-  <!-- STEP 4: REALITY JUXTAPOSITION & LOOPING -->
-  <section class="card">
-    <div class="step-header">
-      <span class="step-title">4. Reality Juxtaposition &amp; Soften</span>
-      <span class="step-badge" id="code2-badge">Optional mid-code</span>
-    </div>
-
-    <div class="sub-label">In Reality (Present Truth)</div>
-    <div class="chip-row" id="reality-chips"></div>
-    <input type="text" id="reality-note" placeholder="Optional present reality note..." />
-
-    <div class="sub-label">Practice Body Feeling (Opposite of Brace)</div>
-    <div class="chip-row" id="soften-chips"></div>
-
-    <div class="sub-label">Juxtaposition Loops (:xn)</div>
-    <div class="segmented" id="loop-segmented">
-      <button type="button" class="seg-btn" data-val="once">Once (x1)</button>
-      <button type="button" class="seg-btn active" data-val="few">Few (x3)</button>
-      <button type="button" class="seg-btn" data-val="many">Many (x6+)</button>
-    </div>
-
-    <div class="sub-label">Mid-Shift Quick-Code (Code 2)</div>
-    <div class="target-wrap" id="target-code2"></div>
-    <div class="target-readout" id="readout-code2">Tap if state shifted during softening</div>
-  </section>
-
-  <!-- STEP 5: RE-CHECK & RELEASE -->
-  <section class="card">
-    <div class="step-header">
-      <span class="step-title">5. Re-Check (Code 3) &amp; Release</span>
-      <span class="step-badge" id="code3-badge">Tap final state</span>
-    </div>
-
-    <div class="target-wrap" id="target-code3"></div>
-    <div class="target-readout" id="readout-code3">Tap final quadrant &amp; ring</div>
-
-    <div class="sub-label">Autonomic Release Signals</div>
-    <div class="chip-row" id="release-chips"></div>
-  </section>
-
-    <!-- STEP 6: CLOSE & FILE -->
-    <section class="card">
-      <div class="step-header">
-        <span class="step-title">6. Log &amp; Resolve</span>
-      </div>
-      <div class="telemetry-box" id="telemetry-preview">code1 --> time --> code2:few --> time --> code3</div>
-      <button type="button" class="primary-btn" onclick="finishSession()">Complete &amp; Save Pass</button>
-      <button type="button" class="secondary-btn" style="margin-top:8px;" onclick="returnToAtlas()">Return to Atlas</button>
-    </section>
-
-  </section>
-
+    <p class="conclusions-sub">
+      High-level observations, systemic patterns, and grounded truths synthesized across your life domains.
+    </p>
+    <textarea id="global-conclusions-text" rows="5" class="conclusions-textarea" placeholder="Document longitudinal insights and meta-observations here..." oninput="saveGlobalConclusions()"></textarea>
+  </div>
 </main>
 
-<!-- PATTERN EDITOR MODAL -->
-<div class="modal" id="pattern-modal" onclick="closeModalOnBg(event, 'pattern-modal')">
+<!-- EVENT CREATE / EDIT MODAL -->
+<div class="modal" id="event-modal" onclick="closeModalOnBg(event, 'event-modal')">
   <div class="modal-sheet">
     <div class="modal-top">
-      <strong style="font-size: 1rem;" id="pattern-modal-heading">Edit Pattern</strong>
-      <button class="icon-btn" onclick="closeModal('pattern-modal')">Close</button>
+      <strong style="font-size: 1rem;" id="event-modal-heading">Edit Event</strong>
+      <button type="button" class="icon-btn" onclick="closeModal('event-modal')">Close</button>
     </div>
 
-    <input type="hidden" id="pattern-edit-id" />
+    <input type="hidden" id="event-edit-id" />
 
-    <div class="sub-label">Pattern Title / Trigger Loop</div>
-    <input type="text" id="pattern-input-title" placeholder="e.g. Worrying I Hurt Someone's Feelings..." style="margin-top:0;" />
+    <div class="sub-label">Event / Trigger Title</div>
+    <input type="text" id="event-input-title" placeholder="e.g. Parent with Dementia, Worrying I Hurt Someone..." />
 
-    <div class="sub-label">Section / Category</div>
-    <select id="pattern-input-section" style="width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:9px; border-radius:8px; font-size:0.9rem; margin-bottom:8px;"></select>
+    <div class="sub-label">Section</div>
+    <select id="event-input-section" style="margin-bottom:6px;"></select>
 
-    <div class="sub-label">Step 1: Domain</div>
-    <div class="chip-row" id="pattern-modal-domain"></div>
+    <div class="sub-label">Step 1: Origin Domain</div>
+    <div class="chip-row" id="event-chips-domain"></div>
 
-    <div class="sub-label">Step 1: Pattern</div>
-    <div class="chip-row" id="pattern-modal-pattern"></div>
+    <div class="sub-label">Step 1: Pattern Archetype</div>
+    <div class="chip-row" id="event-chips-pattern"></div>
 
     <div class="sub-label">Step 1: Modifiers</div>
-    <div class="chip-row" id="pattern-modal-modifiers"></div>
+    <div class="chip-row" id="event-chips-modifiers"></div>
 
-    <div class="sub-label">Step 3: SAIC Threats</div>
-    <div class="chip-row" id="pattern-modal-saic"></div>
+    <div class="sub-label">Step 3: Core Threats (SAIC)</div>
+    <div class="chip-row" id="event-chips-saic"></div>
 
     <div class="sub-label">Step 4: Reality Anchor Statement</div>
-    <textarea id="pattern-input-reality" rows="2" placeholder="Present truth statement to ground against brace..."></textarea>
+    <textarea id="event-input-reality" rows="2" placeholder="Grounded present truth (e.g. Adult now, Event is over...)"></textarea>
 
-    <div class="sub-label">Personal Observation Notes</div>
-    <textarea id="pattern-input-notes" rows="2" placeholder="Context, frequency, or personal cues..."></textarea>
+    <div class="sub-label">Observation Notes</div>
+    <textarea id="event-input-notes" rows="2" placeholder="Personal context, nuances, or frequencies..."></textarea>
 
-    <button type="button" class="primary-btn" style="margin-top:14px;" onclick="savePatternFromModal()">Save Pattern</button>
+    <button type="button" class="primary-btn" style="margin-top:14px;" onclick="saveEventFromModal()">Save Event</button>
   </div>
 </div>
 
@@ -795,26 +676,15 @@
   <div class="modal-sheet">
     <div class="modal-top">
       <strong style="font-size: 1rem;">Add New Section</strong>
-      <button class="icon-btn" onclick="closeModal('section-modal')">Close</button>
+      <button type="button" class="icon-btn" onclick="closeModal('section-modal')">Close</button>
     </div>
     <div class="sub-label">Section Title</div>
-    <input type="text" id="section-input-title" placeholder="e.g. Work &amp; Deadlines, Intimate Partner..." style="margin-top:0;" />
+    <input type="text" id="section-input-title" placeholder="e.g. Work &amp; Deadlines, Intimate Partner..." />
     <button type="button" class="primary-btn" style="margin-top:14px;" onclick="saveSectionFromModal()">Create Section</button>
   </div>
 </div>
 
-<!-- LOGS HISTORY MODAL -->
-<div class="modal" id="history-modal" onclick="closeModalOnBg(event, 'history-modal')">
-  <div class="modal-sheet">
-    <div class="modal-top">
-      <strong style="font-size: 1rem;">Reconsolidation Logs</strong>
-      <button class="icon-btn" onclick="closeModal('history-modal')">Close</button>
-    </div>
-    <div id="history-list"></div>
-  </div>
-</div>
-
-<div class="toast" id="toast">Copied to clipboard</div>
+<div class="toast" id="toast">Saved</div>
 
 <script>
   // --- DATA DEFINITIONS ---
@@ -1134,8 +1004,11 @@
   // --- ATLAS STATE & STORAGE ---
   const ATLAS_STORAGE_KEY = "somatic_refactor_atlas";
   let atlas = loadAtlas();
-  let editingPatternModal = null; // { secId, patId }
-  let modalPatternState = {};
+  let openSections = new Set(atlas.sections.map(s => s.id));
+  let expandedEvents = new Set();
+  let checkinState = {};
+  let editingTarget = null;
+  let modalChips = {};
 
   function loadAtlas() {
     try {
@@ -1157,9 +1030,173 @@
     }
   }
 
-  function filterAtlas() {
+  function toggleSection(secId) {
+    if (openSections.has(secId)) openSections.delete(secId);
+    else openSections.add(secId);
     renderAtlas();
   }
+
+  function toggleEvent(secId, patId) {
+    if (expandedEvents.has(patId)) expandedEvents.delete(patId);
+    else expandedEvents.add(patId);
+    renderAtlas();
+  }
+
+  function moveSection(secIdx, direction) {
+    const targetIdx = secIdx + direction;
+    if (targetIdx < 0 || targetIdx >= atlas.sections.length) return;
+    const temp = atlas.sections[secIdx];
+    atlas.sections[secIdx] = atlas.sections[targetIdx];
+    atlas.sections[targetIdx] = temp;
+    saveAtlas();
+    renderAtlas();
+  }
+
+  function moveEvent(secIdx, patIdx, direction) {
+    const list = atlas.sections[secIdx].patterns;
+    const targetIdx = patIdx + direction;
+    if (targetIdx < 0 || targetIdx >= list.length) return;
+    const temp = list[patIdx];
+    list[patIdx] = list[targetIdx];
+    list[targetIdx] = temp;
+    saveAtlas();
+    renderAtlas();
+  }
+
+  function toggleBodyCheckin(patId) {
+    const content = document.getElementById("checkin-content-" + patId);
+    const chev = document.getElementById("checkin-chev-" + patId);
+    if (!content) return;
+    const isClosed = content.style.display === "none";
+    content.style.display = isClosed ? "flex" : "none";
+    if (chev) chev.textContent = isClosed ? "▾" : "▸";
+  }
+
+  function setCheckin(patId, axis, val) {
+    if (!checkinState[patId]) checkinState[patId] = {};
+    checkinState[patId][axis] = val;
+
+    const eHi = document.getElementById("btn-energy-hi-" + patId);
+    const eLo = document.getElementById("btn-energy-lo-" + patId);
+    const vNeg = document.getElementById("btn-valence-neg-" + patId);
+    const vPos = document.getElementById("btn-valence-pos-" + patId);
+
+    if (eHi && eLo) {
+      eHi.classList.toggle("active", checkinState[patId].energy === "high");
+      eLo.classList.toggle("active", checkinState[patId].energy === "low");
+    }
+    if (vNeg && vPos) {
+      vNeg.classList.toggle("active", checkinState[patId].valence === "neg");
+      vPos.classList.toggle("active", checkinState[patId].valence === "pos");
+    }
+
+    const res = document.getElementById("checkin-result-" + patId);
+    if (res && checkinState[patId].energy && checkinState[patId].valence) {
+      const { energy, valence } = checkinState[patId];
+      res.className = "checkin-result";
+      if (energy === "high" && valence === "neg") {
+        res.classList.add("red");
+        res.innerHTML = "🔴 <strong>Alarm / Bracing (Red):</strong> High arousal with threat perception. Step away and breathe before acting.";
+      } else if (energy === "high" && valence === "pos") {
+        res.classList.add("yellow");
+        res.innerHTML = "🟡 <strong>Mobilized / Drive (Yellow):</strong> High energy with positive valence. Alert engagement.";
+      } else if (energy === "low" && valence === "neg") {
+        res.classList.add("blue");
+        res.innerHTML = "🔵 <strong>Flat / Depleted (Blue):</strong> Low energy with negative valence. Rest and self-compassion needed.";
+      } else {
+        res.classList.add("green");
+        res.innerHTML = "🟢 <strong>Settled / Ease (Green):</strong> Low energy with safety. Baseline calm restored.";
+      }
+    }
+  }
+
+  function filterAtlas() {
+    const q = (document.getElementById("atlas-search")?.value || "").trim();
+    const clearBtn = document.getElementById("clear-search-btn");
+    if (clearBtn) clearBtn.style.display = q ? "block" : "none";
+    renderAtlas();
+  }
+
+  function clearSearch() {
+    const input = document.getElementById("atlas-search");
+    if (input) input.value = "";
+    filterAtlas();
+  }
+  function renderEventCard(sec, pat, secIdx, patIdx, totalCount, q) {
+    const isExp = q ? true : expandedEvents.has(pat.id);
+    const isF = patIdx === 0, isL = patIdx === totalCount - 1;
+    const snippet = pat.reality.length > 55 ? pat.reality.slice(0, 55) + "..." : pat.reality;
+
+    const ev = document.createElement("div");
+    ev.className = "event-card" + (isExp ? " expanded" : "");
+    ev.innerHTML = `
+      <div class="event-row" onclick="toggleEvent('${sec.id}', '${pat.id}')">
+        <div class="event-row-left">
+          <span class="event-bolt">⚡</span>
+          <div class="event-summary-wrap">
+            <span class="event-title-text">${pat.title}</span>
+            <div class="event-pills-line">
+              <span class="threat-pill">${pat.saic.join(" + ")}</span>
+              <span class="reality-summary-text">${snippet}</span>
+            </div>
+          </div>
+        </div>
+        <div class="event-row-right" onclick="event.stopPropagation()">
+          <button type="button" class="order-btn" title="Move Up" ${isF ? "disabled" : ""} onclick="moveEvent(${secIdx}, ${patIdx}, -1)">▲</button>
+          <button type="button" class="order-btn" title="Move Down" ${isL ? "disabled" : ""} onclick="moveEvent(${secIdx}, ${patIdx}, 1)">▼</button>
+          <span class="event-chevron" onclick="toggleEvent('${sec.id}', '${pat.id}')">${isExp ? "▴" : "▾"}</span>
+        </div>
+      </div>
+      <div class="event-details" style="display:${isExp ? "flex" : "none"};">
+        <div class="detail-block">
+          <div class="detail-label">Origin &amp; Pattern</div>
+          <div class="detail-tags">
+            <span class="tag-domain">${pat.domain}</span>
+            <span class="tag-pattern">${pat.pattern}</span>
+            ${pat.modifiers.map(m => `<span class="tag-mod">${m}</span>`).join("")}
+          </div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Core Threat (SAIC)</div>
+          <div class="threat-box"><strong>${pat.saic.join(" + ")}</strong></div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Reality Anchor (Grounded Truth)</div>
+          <div class="reality-box">${pat.reality}</div>
+        </div>
+        ${pat.notes ? `<div class="detail-block"><div class="detail-label">Observation Notes</div><div class="notes-box">${pat.notes}</div></div>` : ""}
+        <div class="body-checkin-drawer">
+          <div class="body-checkin-toggle" onclick="toggleBodyCheckin('${pat.id}')">
+            <span>🧭 Optional Body State (Energy &amp; Valence)</span>
+            <span class="sub-chevron" id="checkin-chev-${pat.id}">▸</span>
+          </div>
+          <div class="body-checkin-content" id="checkin-content-${pat.id}" style="display:none;">
+            <div class="axis-group">
+              <div class="axis-label">Energy Level:</div>
+              <div class="axis-toggle">
+                <button type="button" class="axis-btn" id="btn-energy-hi-${pat.id}" onclick="setCheckin('${pat.id}', 'energy', 'high')">⚡ High Energy (Braced)</button>
+                <button type="button" class="axis-btn" id="btn-energy-lo-${pat.id}" onclick="setCheckin('${pat.id}', 'energy', 'low')">🔋 Low Energy (Flat)</button>
+              </div>
+            </div>
+            <div class="axis-group">
+              <div class="axis-label">Valence:</div>
+              <div class="axis-toggle">
+                <button type="button" class="axis-btn" id="btn-valence-neg-${pat.id}" onclick="setCheckin('${pat.id}', 'valence', 'neg')">⚠️ Threat / Alarm</button>
+                <button type="button" class="axis-btn" id="btn-valence-pos-${pat.id}" onclick="setCheckin('${pat.id}', 'valence', 'pos')">🌿 Safe / Settled</button>
+              </div>
+            </div>
+            <div class="checkin-result" id="checkin-result-${pat.id}"></div>
+          </div>
+        </div>
+        <div class="event-footer-actions">
+          <button type="button" class="edit-event-btn" onclick="openEventModal('${sec.id}', '${pat.id}')">✎ Edit Event</button>
+          <button type="button" class="delete-event-btn" onclick="deletePattern('${sec.id}', '${pat.id}')">✕ Delete</button>
+        </div>
+      </div>
+    `;
+    return ev;
+  }
+
 
   function renderAtlas() {
     const q = (document.getElementById("atlas-search")?.value || "").toLowerCase().trim();
@@ -1167,75 +1204,50 @@
     if (!container) return;
     container.innerHTML = "";
 
-    atlas.sections.forEach(sec => {
-      const filteredPatterns = sec.patterns.filter(p => {
+    atlas.sections.forEach((sec, secIdx) => {
+      const filtered = sec.patterns.filter(p => {
         if (!q) return true;
-        const searchStr = `${p.title} ${p.domain} ${p.pattern} ${p.modifiers.join(" ")} ${p.saic.join(" ")} ${p.reality} ${p.notes || ""}`.toLowerCase();
-        return searchStr.includes(q);
+        const text = `${p.title} ${p.domain} ${p.pattern} ${p.modifiers.join(" ")} ${p.saic.join(" ")} ${p.reality} ${p.notes || ""}`.toLowerCase();
+        return text.includes(q);
       });
+      if (q && !filtered.length) return;
 
-      if (q && filteredPatterns.length === 0) return;
+      const isOpen = q ? true : openSections.has(sec.id);
+      const isFirst = secIdx === 0, isLast = secIdx === atlas.sections.length - 1;
 
-      const secEl = document.createElement("div");
-      secEl.className = "section-card";
-
-      const header = document.createElement("div");
-      header.className = "section-header";
-      header.innerHTML = `
-        <div class="section-title">
-          <span>${sec.title}</span>
-          <span class="step-badge">${filteredPatterns.length}</span>
+      const card = document.createElement("div");
+      card.className = "section-card";
+      card.innerHTML = `
+        <div class="section-header" onclick="toggleSection('${sec.id}')">
+          <div class="section-header-left">
+            <span class="chevron">${isOpen ? "▾" : "▸"}</span>
+            <span class="section-title-text">${sec.title}</span>
+            <span class="count-badge">${filtered.length}</span>
+          </div>
+          <div class="section-header-right" onclick="event.stopPropagation()">
+            <button type="button" class="order-btn" title="Move Up" ${isFirst ? "disabled" : ""} onclick="moveSection(${secIdx}, -1)">▲</button>
+            <button type="button" class="order-btn" title="Move Down" ${isLast ? "disabled" : ""} onclick="moveSection(${secIdx}, 1)">▼</button>
+            <button type="button" class="icon-btn" onclick="openEventModal('${sec.id}')">+ Event</button>
+            <button type="button" class="danger-icon-btn" title="Delete section" onclick="deleteSection('${sec.id}')">✕</button>
+          </div>
         </div>
-        <div class="section-actions">
-          <button type="button" class="icon-btn" onclick="openPatternModal('${sec.id}')">+ Pattern</button>
-          <button type="button" class="danger-btn" title="Delete section" onclick="deleteSection('${sec.id}')">✕</button>
-        </div>
+        <div class="section-body" style="display:${isOpen ? "flex" : "none"};"></div>
       `;
-      secEl.appendChild(header);
 
-      if (filteredPatterns.length === 0) {
-        const empty = document.createElement("p");
-        empty.style.color = "var(--muted)";
-        empty.style.fontSize = "0.85rem";
-        empty.style.margin = "4px 0";
-        empty.textContent = "No patterns in this section yet. Tap + Pattern to add one.";
-        secEl.appendChild(empty);
+      const body = card.querySelector(".section-body");
+      if (!filtered.length) {
+        body.innerHTML = `<p style="color:var(--muted); font-size:0.82rem; margin:4px 0;">No events in this section. Tap + Event to add one.</p>`;
       } else {
-        filteredPatterns.forEach(pat => {
-          const patEl = document.createElement("div");
-          patEl.className = "pattern-card";
-
-          const modTags = pat.modifiers.map(m => `<span class="pattern-tag modifier">${m}</span>`).join("");
-          const saicTags = pat.saic.map(s => `<span class="pattern-tag saic">${s}</span>`).join("");
-          const notesHtml = pat.notes ? `<div class="pattern-notes">Note: ${pat.notes}</div>` : "";
-
-          patEl.innerHTML = `
-            <div class="pattern-header">
-              <div class="pattern-title">${pat.title}</div>
-              <div class="pattern-actions">
-                <button type="button" class="run-btn" onclick="runPassForPattern('${sec.id}', '${pat.id}')">▶ Run Pass</button>
-                <button type="button" class="icon-btn" style="padding:4px 8px; font-size:0.78rem;" onclick="openPatternModal('${sec.id}', '${pat.id}')">✎</button>
-                <button type="button" class="danger-btn" title="Delete pattern" onclick="deletePattern('${sec.id}', '${pat.id}')">✕</button>
-              </div>
-            </div>
-            <div class="pattern-tags">
-              <span class="pattern-tag source">${pat.domain} · ${pat.pattern}</span>
-              ${modTags}
-              ${saicTags}
-            </div>
-            <div class="pattern-reality"><b>Reality:</b> ${pat.reality}</div>
-            ${notesHtml}
-          `;
-          secEl.appendChild(patEl);
+        filtered.forEach((pat, patIdx) => {
+          body.appendChild(renderEventCard(sec, pat, secIdx, patIdx, filtered.length, q));
         });
       }
-
-      container.appendChild(secEl);
+      container.appendChild(card);
     });
 
-    const conclusionsEl = document.getElementById("global-conclusions-text");
-    if (conclusionsEl && document.activeElement !== conclusionsEl) {
-      conclusionsEl.value = atlas.globalConclusions || "";
+    const concEl = document.getElementById("global-conclusions-text");
+    if (concEl && document.activeElement !== concEl) {
+      concEl.value = atlas.globalConclusions || "";
     }
   }
 
@@ -1269,9 +1281,9 @@
     }
   }
 
-  function openPatternModal(secId, patId) {
-    editingPatternModal = { secId, patId: patId || null };
-    const secSelect = document.getElementById("pattern-input-section");
+  function openEventModal(secId, patId) {
+    editingTarget = { secId, patId: patId || null };
+    const secSelect = document.getElementById("event-input-section");
     secSelect.innerHTML = "";
     atlas.sections.forEach(s => {
       const opt = document.createElement("option");
@@ -1281,8 +1293,8 @@
       secSelect.appendChild(opt);
     });
 
-    const heading = document.getElementById("pattern-modal-heading");
-    let initialPattern = {
+    const heading = document.getElementById("event-modal-heading");
+    let current = {
       title: "",
       domain: "Interpersonal",
       pattern: "Tone / Dismissal",
@@ -1296,101 +1308,109 @@
       const sec = atlas.sections.find(s => s.id === secId);
       const existing = sec?.patterns.find(p => p.id === patId);
       if (existing) {
-        initialPattern = JSON.parse(JSON.stringify(existing));
-        heading.textContent = "Edit Pattern";
+        current = JSON.parse(JSON.stringify(existing));
+        heading.textContent = "Edit Event";
       }
     } else {
-      heading.textContent = "Add New Pattern";
+      heading.textContent = "Add New Event";
     }
 
-    document.getElementById("pattern-input-title").value = initialPattern.title;
-    document.getElementById("pattern-input-reality").value = initialPattern.reality;
-    document.getElementById("pattern-input-notes").value = initialPattern.notes || "";
+    document.getElementById("event-input-title").value = current.title;
+    document.getElementById("event-input-reality").value = current.reality;
+    document.getElementById("event-input-notes").value = current.notes || "";
 
-    renderModalSingleChips("pattern-modal-domain", DOMAINS, initialPattern, "domain");
-    renderModalSingleChips("pattern-modal-pattern", PATTERNS, initialPattern, "pattern");
-    renderModalMultiChips("pattern-modal-modifiers", MODIFIERS, initialPattern, "modifiers", "warn");
-    renderModalMultiChips("pattern-modal-saic", Object.keys(SAIC_DATA), initialPattern, "saic", "saic-chip");
+    modalChips = {
+      domain: current.domain,
+      pattern: current.pattern,
+      modifiers: [...current.modifiers],
+      saic: [...current.saic]
+    };
 
-    openModal("pattern-modal");
+    renderModalChips();
+    openModal("event-modal");
   }
 
-  function renderModalSingleChips(containerId, items, obj, key) {
-    modalPatternState[key] = obj[key] || items[0];
+  function renderModalChips() {
+    renderSingleChipGroup("event-chips-domain", DOMAINS, "domain");
+    renderSingleChipGroup("event-chips-pattern", PATTERNS, "pattern");
+    renderMultiChipGroup("event-chips-modifiers", MODIFIERS, "modifiers", "warn");
+    renderMultiChipGroup("event-chips-saic", SAIC_KEYS, "saic", "threat-chip");
+  }
+
+  function renderSingleChipGroup(containerId, items, key) {
     const el = document.getElementById(containerId);
     el.innerHTML = "";
     items.forEach(item => {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "chip" + (modalPatternState[key] === item ? " active" : "");
+      btn.className = "chip" + (modalChips[key] === item ? " active" : "");
       btn.textContent = item;
       btn.onclick = () => {
-        modalPatternState[key] = item;
-        renderModalSingleChips(containerId, items, modalPatternState, key);
+        modalChips[key] = item;
+        renderSingleChipGroup(containerId, items, key);
       };
       el.appendChild(btn);
     });
   }
 
-  function renderModalMultiChips(containerId, items, obj, key, extraClass = "") {
-    modalPatternState[key] = obj[key] ? [...obj[key]] : [];
+  function renderMultiChipGroup(containerId, items, key, extraClass) {
     const el = document.getElementById(containerId);
     el.innerHTML = "";
     items.forEach(item => {
-      const active = modalPatternState[key].includes(item);
+      const active = modalChips[key].includes(item);
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = `chip ${extraClass} ${active ? "active" : ""}`.trim();
       btn.textContent = item;
       btn.onclick = () => {
         if (active) {
-          modalPatternState[key] = modalPatternState[key].filter(x => x !== item);
+          modalChips[key] = modalChips[key].filter(x => x !== item);
         } else {
-          modalPatternState[key].push(item);
+          modalChips[key].push(item);
         }
-        renderModalMultiChips(containerId, items, modalPatternState, key, extraClass);
+        renderMultiChipGroup(containerId, items, key, extraClass);
       };
       el.appendChild(btn);
     });
   }
 
-  function savePatternFromModal() {
-    const title = document.getElementById("pattern-input-title").value.trim();
+  function saveEventFromModal() {
+    const title = document.getElementById("event-input-title").value.trim();
     if (!title) {
-      alert("Please enter a pattern title.");
+      alert("Please enter an event title.");
       return;
     }
-    const targetSecId = document.getElementById("pattern-input-section").value;
-    const reality = document.getElementById("pattern-input-reality").value.trim();
-    const notes = document.getElementById("pattern-input-notes").value.trim();
+    const targetSecId = document.getElementById("event-input-section").value;
+    const reality = document.getElementById("event-input-reality").value.trim();
+    const notes = document.getElementById("event-input-notes").value.trim();
 
-    const patternData = {
-      id: editingPatternModal?.patId || ("pat-" + Date.now()),
+    const eventData = {
+      id: editingTarget?.patId || ("pat-" + Date.now()),
       title,
-      domain: modalPatternState.domain || "Interpersonal",
-      pattern: modalPatternState.pattern || "Tone / Dismissal",
-      modifiers: modalPatternState.modifiers || [],
-      saic: modalPatternState.saic.length ? modalPatternState.saic : ["Safety"],
+      domain: modalChips.domain || "Interpersonal",
+      pattern: modalChips.pattern || "Tone / Dismissal",
+      modifiers: modalChips.modifiers || [],
+      saic: modalChips.saic.length ? modalChips.saic : ["Safety"],
       reality: reality || "Adult now, Event is over",
       notes
     };
 
-    if (editingPatternModal?.patId) {
-      const origSec = atlas.sections.find(s => s.id === editingPatternModal.secId);
+    if (editingTarget?.patId) {
+      const origSec = atlas.sections.find(s => s.id === editingTarget.secId);
       if (origSec) {
-        origSec.patterns = origSec.patterns.filter(p => p.id !== editingPatternModal.patId);
+        origSec.patterns = origSec.patterns.filter(p => p.id !== editingTarget.patId);
       }
     }
 
     const destSec = atlas.sections.find(s => s.id === targetSecId);
     if (destSec) {
-      destSec.patterns.push(patternData);
+      destSec.patterns.push(eventData);
     }
 
     saveAtlas();
-    closeModal("pattern-modal");
+    closeModal("event-modal");
     renderAtlas();
-    showToast("Pattern saved");
+    showToast("Event saved");
   }
 
   function deletePattern(secId, patId) {
@@ -1398,284 +1418,76 @@
     if (!sec) return;
     const pat = sec.patterns.find(p => p.id === patId);
     if (!pat) return;
-    if (confirm(`Delete pattern "${pat.title}"?`)) {
+    if (confirm(`Delete event "${pat.title}"?`)) {
       sec.patterns = sec.patterns.filter(p => p.id !== patId);
       saveAtlas();
       renderAtlas();
-      showToast("Pattern deleted");
+      showToast("Event deleted");
     }
   }
 
-  // --- RECONSOLIDATION PASS RUNNER ---
-  function runPassForPattern(secId, patId) {
-    const sec = atlas.sections.find(s => s.id === secId);
-    const pat = sec?.patterns.find(p => p.id === patId);
-    if (!pat) return;
-
-    state = createFreshState();
-    state.domain = pat.domain;
-    state.pattern = pat.pattern;
-    state.modifiers = [...pat.modifiers];
-    state.saic = [...pat.saic];
-    state.realities = [pat.reality];
-
-    document.getElementById("facts-note").value = "";
-    document.getElementById("assumption-note").value = "";
-    document.getElementById("reality-note").value = pat.reality;
-    document.getElementById("workflow-active-title").textContent = pat.title;
-
-    renderSingleChips("domain-chips", DOMAINS, "domain", updateStep1Badge);
-    renderSingleChips("pattern-chips", PATTERNS, "pattern", updateStep1Badge);
-    renderMultiChips("modifier-chips", MODIFIERS, "modifiers", "warn", updateStep1Badge);
-    updateStep1Badge();
-
-    renderMultiChips("saic-chips", Object.keys(SAIC_DATA), "saic", "saic-chip", renderSaicHints);
-    renderSaicHints();
-
-    renderMultiChips("reality-chips", REALITIES, "realities", "green-chip");
-    renderChargeStrip();
-
-    document.getElementById("atlas-view").style.display = "none";
-    document.getElementById("workflow-view").style.display = "block";
-    window.scrollTo(0, 0);
-  }
-
-  function startScratchpadPass() {
-    state = createFreshState();
-    document.getElementById("facts-note").value = "";
-    document.getElementById("assumption-note").value = "";
-    document.getElementById("reality-note").value = "";
-    document.getElementById("workflow-active-title").textContent = "Blank Reconsolidation Pass";
-
-    renderSingleChips("domain-chips", DOMAINS, "domain", updateStep1Badge);
-    renderSingleChips("pattern-chips", PATTERNS, "pattern", updateStep1Badge);
-    renderMultiChips("modifier-chips", MODIFIERS, "modifiers", "warn", updateStep1Badge);
-    updateStep1Badge();
-
-    renderMultiChips("saic-chips", Object.keys(SAIC_DATA), "saic", "saic-chip", renderSaicHints);
-    renderSaicHints();
-
-    renderMultiChips("reality-chips", REALITIES, "realities", "green-chip");
-    renderChargeStrip();
-
-    document.getElementById("atlas-view").style.display = "none";
-    document.getElementById("workflow-view").style.display = "block";
-    window.scrollTo(0, 0);
-  }
-
-  function returnToAtlas() {
-    document.getElementById("workflow-view").style.display = "none";
-    document.getElementById("atlas-view").style.display = "block";
-    renderAtlas();
-    window.scrollTo(0, 0);
-  }
-
-  // --- INITIALIZATION ---
-  function init() {
-    renderAtlas();
-
-    renderSingleChips("domain-chips", DOMAINS, "domain", updateStep1Badge);
-    renderSingleChips("pattern-chips", PATTERNS, "pattern", updateStep1Badge);
-    renderMultiChips("modifier-chips", MODIFIERS, "modifiers", "warn", updateStep1Badge);
-
-    renderTarget("target-code1", "code1");
-    renderMultiChips("sensation-chips", SENSATIONS, "sensations");
-    renderMultiChips("location-chips", LOCATIONS, "locations");
-    renderChargeStrip();
-
-    renderMultiChips("saic-chips", Object.keys(SAIC_DATA), "saic", "saic-chip", renderSaicHints);
-
-    renderMultiChips("reality-chips", REALITIES, "realities", "green-chip");
-    renderMultiChips("soften-chips", SOFTENS, "softens", "green-chip");
-    initLoopControl();
-    renderTarget("target-code2", "code2");
-
-    renderTarget("target-code3", "code3");
-    renderMultiChips("release-chips", RELEASES, "releases", "green-chip");
-
-    updateLogCount();
-    updateTelemetry();
-  }
-
-  function renderSingleChips(containerId, items, stateKey, onChange) {
-    const el = document.getElementById(containerId);
-    el.innerHTML = "";
-    items.forEach(item => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "chip" + (state[stateKey] === item ? " active" : "");
-      btn.textContent = item;
-      btn.onclick = () => {
-        state[stateKey] = state[stateKey] === item ? "" : item;
-        renderSingleChips(containerId, items, stateKey, onChange);
-        if (onChange) onChange();
-      };
-      el.appendChild(btn);
-    });
-  }
-
-  function renderMultiChips(containerId, items, stateKey, extraClass = "", onChange) {
-    const el = document.getElementById(containerId);
-    el.innerHTML = "";
-    items.forEach(item => {
-      const active = state[stateKey].includes(item);
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = `chip ${extraClass} ${active ? "active" : ""}`.trim();
-      btn.textContent = item;
-      btn.onclick = () => {
-        if (active) {
-          state[stateKey] = state[stateKey].filter(x => x !== item);
-        } else {
-          state[stateKey].push(item);
-        }
-        renderMultiChips(containerId, items, stateKey, extraClass, onChange);
-        if (onChange) onChange();
-      };
-      el.appendChild(btn);
-    });
-  }
-
-  function updateStep1Badge() {
-    const parts = [state.domain, state.pattern, ...state.modifiers].filter(Boolean);
-    document.getElementById("step1-badge").textContent = parts.length ? parts.join(" · ") : "Select source";
-  }
-
-  function renderChargeStrip() {
-    const el = document.getElementById("charge-strip");
-    el.innerHTML = "";
-    for (let i = 1; i <= 10; i++) {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "charge-btn" + (i > 5 ? " hot" : "") + (state.charge === i ? " active" : "");
-      btn.textContent = i;
-      btn.onclick = () => {
-        state.charge = i;
-        renderChargeStrip();
-        document.getElementById("charge-alert").style.display = i > 5 ? "block" : "none";
-      };
-      el.appendChild(btn);
-    }
-  }
-
-  function renderSaicHints() {
-    const badge = document.getElementById("saic-badge");
-    badge.textContent = state.saic.length ? state.saic.join(" + ") : "Multi-select";
-    const container = document.getElementById("saic-hints");
-    container.innerHTML = "";
-    state.saic.forEach(key => {
-      const info = SAIC_DATA[key];
-      const div = document.createElement("div");
-      div.className = "saic-hint-card";
-      div.innerHTML = `<strong>${info.title}</strong><br>${info.prompt}`;
-      container.appendChild(div);
-    });
-  }
-
-  function initLoopControl() {
-    document.querySelectorAll("#loop-segmented .seg-btn").forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll("#loop-segmented .seg-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        state.loops = btn.dataset.val;
-        updateTelemetry();
-      };
-    });
-  }
-
-  // --- 4-QUADRANT x 3-RING SVG TARGET ---
-  // Top-Left: Red (Neg Valence, High Arousal)
-  // Top-Right: Yellow (Pos Valence, High Arousal)
-  // Bottom-Left: Blue (Neg Valence, Low Arousal)
-  // Bottom-Right: Green (Pos Valence, Low Arousal)
-  function renderTarget(containerId, stateKey) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    const size = 280;
-    const cx = size / 2;
-    const cy = size / 2;
-    const maxR = 128;
-    const ringStep = maxR / 3;
-
-    const quadrants = [
-      { code: "R", startAngle: 180, endAngle: 270, base: "#f85149" },
-      { code: "Y", startAngle: 270, endAngle: 360, base: "#d29922" },
-      { code: "G", startAngle: 0,   endAngle: 90,  base: "#3fb950" },
-      { code: "B", startAngle: 90,  endAngle: 180, base: "#58a6ff" }
-    ];
-
-    let svg = `<svg viewBox="0 0 ${size} ${size}" class="target-svg">`;
-
-    // Draw outer to inner rings (3 down to 1)
-    for (let ring = 3; ring >= 1; ring--) {
-      const rOuter = ring * ringStep;
-      const rInner = (ring - 1) * ringStep;
-      const opacity = 0.2 + ring * 0.25;
-
-      quadrants.forEach(q => {
-        const fullCode = `${q.code}${ring}`;
-        const isSelected = state[stateKey] === fullCode;
-        const d = describeArcWedge(cx, cy, rInner, rOuter, q.startAngle, q.endAngle);
-        const stroke = isSelected ? "#ffffff" : "#0d1117";
-        const strokeWidth = isSelected ? 2.5 : 1.2;
-        const fillOpacity = isSelected ? 0.95 : opacity;
-
-        // Label placement
-        const midAngle = ((q.startAngle + q.endAngle) / 2) * (Math.PI / 180);
-        const midR = (rInner + rOuter) / 2;
-        const lx = cx + midR * Math.cos(midAngle);
-        const ly = cy + midR * Math.sin(midAngle);
-
-        svg += `<path d="${d}" fill="${q.base}" fill-opacity="${fillOpacity}" stroke="${stroke}" stroke-width="${strokeWidth}" class="wedge" onclick="selectCode('${stateKey}', '${fullCode}')"></path>`;
-        svg += `<text x="${lx}" y="${ly}" fill="#ffffff" font-size="11" font-weight="${isSelected ? '800' : '600'}" text-anchor="middle" dominant-baseline="central" pointer-events="none">${fullCode}</text>`;
+  // --- EXPORT & HELPERS ---
+  function exportAtlasMarkdown() {
+    let out = "# Somatic Refactor: Personal Field Guide & Trigger Map\n\n";
+    atlas.sections.forEach((sec, idx) => {
+      out += `## ${idx + 1}. ${sec.title}\n\n`;
+      out += "| Recurring Scenario | Step 1: Domain & Pattern | Step 3: SAIC Threats | Step 4: Reality Anchor |\n";
+      out += "| :--- | :--- | :--- | :--- |\n";
+      sec.patterns.forEach(p => {
+        const mods = p.modifiers.length ? ` + [${p.modifiers.join(", ")}]` : "";
+        const saicStr = p.saic.join(" + ");
+        const notesStr = p.notes ? ` *(${p.notes})*` : "";
+        out += `| **${p.title}** | \`${p.domain}\` + \`${p.pattern}\`${mods} | **${saicStr}** | ${p.reality}${notesStr} |\n`;
       });
+      out += "\n---\n\n";
+    });
+    if (atlas.globalConclusions) {
+      out += "## 7. Global Conclusions & Meta-Observations\n\n";
+      out += atlas.globalConclusions + "\n";
     }
-
-    // Crosshairs
-    svg += `<line x1="${cx}" y1="4" x2="${cx}" y2="${size - 4}" stroke="#30363d" stroke-width="1.5" pointer-events="none"/>`;
-    svg += `<line x1="4" y1="${cy}" x2="${size - 4}" y2="${cy}" stroke="#30363d" stroke-width="1.5" pointer-events="none"/>`;
-    svg += `</svg>`;
-
-    container.innerHTML = svg;
+    copyText(out);
+    showToast("Exported Field Guide to clipboard");
   }
 
-  function describeArcWedge(cx, cy, rIn, rOut, startDeg, endDeg) {
-    const rad = Math.PI / 180;
-    const a1 = startDeg * rad;
-    const a2 = endDeg * rad;
-    const x1Out = cx + rOut * Math.cos(a1);
-    const y1Out = cy + rOut * Math.sin(a1);
-    const x2Out = cx + rOut * Math.cos(a2);
-    const y2Out = cy + rOut * Math.sin(a2);
+  function openModal(id) { document.getElementById(id).classList.add("open"); }
+  function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+  function closeModalOnBg(e, id) { if (e.target.id === id) closeModal(id); }
 
-    if (rIn === 0) {
-      return `M ${cx} ${cy} L ${x1Out} ${y1Out} A ${rOut} ${rOut} 0 0 1 ${x2Out} ${y2Out} Z`;
+  function copyText(str) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(str).then(() => showToast("Copied to clipboard"));
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = str;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      showToast("Copied to clipboard");
     }
-    const x1In = cx + rIn * Math.cos(a1);
-    const y1In = cy + rIn * Math.sin(a1);
-    const x2In = cx + rIn * Math.cos(a2);
-    const y2In = cy + rIn * Math.sin(a2);
-    return `M ${x1In} ${y1In} L ${x1Out} ${y1Out} A ${rOut} ${rOut} 0 0 1 ${x2Out} ${y2Out} L ${x2In} ${y2In} A ${rIn} ${rIn} 0 0 0 ${x1In} ${y1In} Z`;
   }
 
-  function selectCode(stateKey, code) {
-    const now = Date.now();
-    state[stateKey] = code;
-    if (stateKey === "code1" && !state.tCode1) state.tCode1 = now;
-    if (stateKey === "code2") state.tCode2 = now;
-    if (stateKey === "code3") state.tCode3 = now;
-
-    renderTarget(`target-${stateKey}`, stateKey);
-    const badge = document.getElementById(`${stateKey}-badge`);
-    if (badge) badge.textContent = code;
-    const readout = document.getElementById(`readout-${stateKey}`);
-    if (readout) readout.textContent = `${code}: ${ANNOTATIONS[code] || ""}`;
-
-    if (stateKey === "code1" && code === "R3") {
-      document.getElementById("charge-alert").style.display = "block";
-    }
-    updateTelemetry();
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2000);
   }
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+
+  renderAtlas();
+</script>
+</body>
+</html>
+
+
+
+
 
   function formatDuration(ms) {
     if (!ms || ms < 0) return "0m15s";

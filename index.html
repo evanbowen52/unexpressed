@@ -1013,7 +1013,12 @@
   function loadAtlas() {
     try {
       const saved = localStorage.getItem(ATLAS_STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && Array.isArray(parsed.sections) && parsed.sections.length > 0) {
+          return parsed;
+        }
+      }
     } catch(e) {}
     return JSON.parse(JSON.stringify(DEFAULT_ATLAS));
   }

@@ -1,0 +1,10 @@
+{
+  "name": "Somatic Refactor",
+  "short_name": "Refactor",
+  "description": "Post-regulation memory reconsolidation & SAIC somatic logger",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "orientation": "portrait"
+}

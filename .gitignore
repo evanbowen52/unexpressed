@@ -1,0 +1,12 @@
+# OS / Editor artifacts
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+.vscode/
+
+# Google Drive pointer
+*.gdoc
+
+# Node / local caches
+node_modules/

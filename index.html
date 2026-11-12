@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0d1117" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Somatic Refactor</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface-alt: #1f2630;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --red: #f85149;
+      --red-bg: rgba(248, 81, 73, 0.16);
+      --yellow: #d29922;
+      --yellow-bg: rgba(210, 153, 34, 0.16);
+      --blue: #58a6ff;
+      --blue-bg: rgba(88, 166, 255, 0.16);
+      --green: #3fb950;
+      --green-bg: rgba(63, 185, 80, 0.16);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.45;
+      padding-bottom: 90px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(13, 17, 23, 0.94);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gate-banner {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--green);
+      letter-spacing: 0.01em;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    main {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .step-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .step-badge {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.82rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .sub-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 10px 0 6px;
+      font-weight: 600;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .chip {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 0.86rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.12s ease;
+    }
+
+    .chip.active {
+      background: rgba(88, 166, 255, 0.2);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .chip.warn.active {
+      background: var(--yellow-bg);
+      border-color: var(--yellow);
+      color: #ffd37a;
+    }
+
+    .chip.saic-chip.active {
+      background: var(--red-bg);
+      border-color: var(--red);
+      color: #ffb3ae;
+    }
+
+    .chip.green-chip.active {
+      background: var(--green-bg);
+      border-color: var(--green);
+      color: #aef5b8;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      margin-top: 8px;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* Interactive 4-Quadrant x 5-Ring SVG Target */
+    .target-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 8px 0;
+    }
+
+    .target-svg {
+      width: 100%;
+      max-width: 280px;
+      height: auto;
+      touch-action: manipulation;
+    }
+
+    .wedge {
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    }
+
+    .wedge:hover { opacity: 0.9; }
+
+    .target-readout {
+      margin-top: 6px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+      min-height: 1.3em;
+    }
+
+    /* Charge 1-10 strip */
+    .charge-strip {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .charge-btn {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 0;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .charge-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0d1117;
+    }
+
+    .charge-btn.hot.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    .alert-box {
+      margin-top: 8px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: var(--red-bg);
+      border: 1px solid var(--red);
+      color: #ffb3ae;
+      font-size: 0.84rem;
+      display: none;
+    }
+
+    .saic-hints {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .saic-hint-card {
+      background: var(--bg);
+      border-left: 3px solid var(--red);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.84rem;
+    }
+
+    .saic-hint-card strong {
+      color: #ffb3ae;
+    }
+
+    /* Segmented Loop Control */
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .seg-btn {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .seg-btn.active {
+      background: var(--yellow-bg);
+      border-color: var(--yellow);
+      color: #ffd37a;
+    }
+
+    .telemetry-box {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      color: var(--green);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .primary-btn {
+      width: 100%;
+      background: var(--green);
+      color: #0d1117;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .secondary-btn {
+      width: 100%;
+      background: var(--surface-alt);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    /* Modals / Drawers */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      z-index: 100;
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-sheet {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-radius: 16px 16px 0 0;
+      width: 100%;
+      max-width: 640px;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 18px 16px 32px;
+    }
+
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .guide-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+    }
+
+    .guide-title {
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+
+    .guide-meta {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .guide-meta span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .guide-meta b {
+      color: #ffb3ae;
+    }
+
+    .guide-meta em {
+      color: #aef5b8;
+      font-style: normal;
+    }
+
+    /* Locked Rest Screen */
+    #rest-screen {
+      display: none;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #238636;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 200;
+    }
+
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="gate-banner">Are you calm enough?</div>
+  <div class="header-actions">
+    <button class="icon-btn" onclick="openModal('guide-modal')">? Field Guide</button>
+    <button class="icon-btn" onclick="openHistory()">Logs (<span id="log-count">0</span>)</button>
+  </div>
+</header>
+
+<main id="workflow">
+
+  <!-- STEP 1: BARE FACTS -->
+  <section class="card">
+    <div class="step-header">
+      <span class="step-title">1. Bare Facts (Silent Video)</span>
+      <span class="step-badge" id="step1-badge">Select source</span>
+    </div>
+
+    <div class="sub-label">Domain</div>
+    <div class="chip-row" id="domain-chips"></div>
+
+    <div class="sub-label">Pattern</div>
+    <div class="chip-row" id="pattern-chips"></div>
+
+    <div class="sub-label">Modifiers</div>
+    <div class="chip-row" id="modifier-chips"></div>
+
+    <input type="text" id="facts-note" placeholder="Optional 1-line objective fact (no motive guessing)..." />
+  </section>
+
+  <!-- STEP 2: BODY SNAPSHOT & CODE 1 -->
+  <section class="card">
+    <div class="step-header">
+      <span class="step-title">2. Body Snapshot (Code 1)</span>
+      <span class="step-badge" id="code1-badge">Tap target</span>
+    </div>
+
+    <div class="target-wrap" id="target-code1"></div>
+    <div class="target-readout" id="readout-code1">Red: High Arousal / Neg • Yellow: High / Pos • Blue: Low / Neg • Green: Low / Pos</div>
+
+    <div class="sub-label">Sensation</div>
+    <div class="chip-row" id="sensation-chips"></div>
+
+    <div class="sub-label">Location</div>
+    <div class="chip-row" id="location-chips"></div>
+
+    <div class="sub-label">Knot Charge (Workable window: 3–5)</div>
+    <div class="charge-strip" id="charge-strip"></div>
+    <div class="alert-box" id="charge-alert">
+      Charge &gt; 5 is too hot for reconsolidation. Step away, regulate (breathe, cool water, feel feet), and return once settled into 3–5.
+    </div>
+  </section>
+
+  <!-- STEP 3: SYSTEM ASSUMPTION & SAIC -->
+  <section class="card">
+    <div class="step-header">
+      <span class="step-title">3. System Assumption &amp; SAIC</span>
+      <span class="step-badge" id="saic-badge">Multi-select</span>
+    </div>
+
+    <div class="chip-row" id="saic-chips"></div>
+    <div class="saic-hints" id="saic-hints"></div>
+
+    <input type="text" id="assumption-note" placeholder="Optional: My system assumed..." />
+  </section>
+
+  <!-- STEP 4: REALITY JUXTAPOSITION & LOOPING -->
+  <section class="card">
+    <div class="step-header">
+      <span class="step-title">4. Reality Juxtaposition &amp; Soften</span>
+      <span class="step-badge" id="code2-badge">Optional mid-code</span>
+    </div>
+
+    <div class="sub-label">In Reality (Present Truth)</div>
+    <div class="chip-row" id="reality-chips"></div>
+    <input type="text" id="reality-note" placeholder="Optional present reality note..." />
+
+    <div class="sub-label">Practice Body Feeling (Opposite of Brace)</div>
+    <div class="chip-row" id="soften-chips"></div>
+
+    <div class="sub-label">Juxtaposition Loops (:xn)</div>
+    <div class="segmented" id="loop-segmented">
+      <button type="button" class="seg-btn" data-val="once">Once (x1)</button>
+      <button type="button" class="seg-btn active" data-val="few">Few (x3)</button>
+      <button type="button" class="seg-btn" data-val="many">Many (x6+)</button>
+    </div>
+
+    <div class="sub-label">Mid-Shift Quick-Code (Code 2)</div>
+    <div class="target-wrap" id="target-code2"></div>
+    <div class="target-readout" id="readout-code2">Tap if state shifted during softening</div>
+  </section>
+
+  <!-- STEP 5: RE-CHECK & RELEASE -->
+  <section class="card">
+    <div class="step-header">
+      <span class="step-title">5. Re-Check (Code 3) &amp; Release</span>
+      <span class="step-badge" id="code3-badge">Tap final state</span>
+    </div>
+
+    <div class="target-wrap" id="target-code3"></div>
+    <div class="target-readout" id="readout-code3">Tap final quadrant &amp; ring</div>
+
+    <div class="sub-label">Autonomic Release Signals</div>
+    <div class="chip-row" id="release-chips"></div>
+  </section>
+
+  <!-- STEP 6: CLOSE & EXPORT -->
+  <section class="card">
+    <div class="step-header">
+      <span class="step-title">6. File &amp; Rest</span>
+    </div>
+    <div class="telemetry-box" id="telemetry-preview">code1 --> time --> code2:few --> time --> code3</div>
+    <button type="button" class="primary-btn" onclick="finishSession()">Save &amp; Copy Obsidian Markdown</button>
+  </section>
+
+</main>
+
+<!-- LOCKED REST SCREEN -->
+<div id="rest-screen" class="card">
+  <h2 style="color: var(--green); margin-top: 0;">Calm again. Done.</h2>
+  <p style="color: var(--muted); font-size: 0.94rem;">
+    Entry saved locally and copied to clipboard. Stop analyzing and let your nervous system file the update while you rest.
+  </p>
+  <div class="telemetry-box" id="final-telemetry"></div>
+  <button type="button" class="secondary-btn" onclick="copyLastMarkdown()">Copy Markdown Again</button>
+  <button type="button" class="secondary-btn" onclick="resetSession()">Start New Refactor</button>
+</div>
+
+<!-- MAP GUIDE MODAL -->
+<div class="modal" id="guide-modal" onclick="closeModalOnBg(event, 'guide-modal')">
+  <div class="modal-sheet">
+    <div class="modal-top">
+      <strong style="font-size: 1rem;">Field Guide & Trigger Map</strong>
+      <button class="icon-btn" onclick="closeModal('guide-modal')">Close</button>
+    </div>
+    <div style="font-size: 0.74rem; color: var(--muted); margin: -4px 0 10px;">Synced with FIELD_GUIDE.md (Single Source of Truth)</div>
+    <input type="text" id="guide-search" placeholder="Filter (e.g., TIP, presentation, feedback, dementia, kids, news, arrow)..." oninput="renderGuide()" style="margin-top:0; margin-bottom:12px;" />
+    <div id="guide-list"></div>
+  </div>
+</div>
+
+<!-- LOGS HISTORY MODAL -->
+<div class="modal" id="history-modal" onclick="closeModalOnBg(event, 'history-modal')">
+  <div class="modal-sheet">
+    <div class="modal-top">
+      <strong style="font-size: 1rem;">Saved Logs (Local Only)</strong>
+      <button class="icon-btn" onclick="closeModal('history-modal')">Close</button>
+    </div>
+    <button type="button" class="secondary-btn" style="margin-top:0; margin-bottom:12px;" onclick="exportAllMarkdown()">Copy All Logs as Markdown</button>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script>
+  // --- DATA DEFINITIONS ---
+  const DOMAINS = ["Interpersonal", "Environmental", "Personal"];
+  const PATTERNS = [
+    "Tone / Dismissal",
+    "Criticism / Correction",
+    "Boundary / Demand",
+    "Silence / Ambiguity",
+    "Plan / System Friction",
+    "Sensory / Scene",
+    "+ Fast Reflex"
+  ];
+  const MODIFIERS = ["Memory Loop", "Third Arrow"];
+  const SENSATIONS = ["Tight", "Hot", "Heavy", "Hollow", "Buzzy", "Clenched"];
+  const LOCATIONS = ["Chest", "Throat", "Jaw", "Gut", "Shoulders", "Head"];
+  const REALITIES = [
+    "Safe room",
+    "Event is over",
+    "Adult now",
+    "Calm ≠ Complicity",
+    "Old wiring ≠ Failure",
+    "I have options"
+  ];
+  const SOFTENS = [
+    "Drop shoulders",
+    "Soft belly",
+    "Unclench jaw",
+    "Long exhale",
+    "Feel heels"
+  ];
+  const RELEASES = [
+    "Sigh",
+    "Yawn",
+    "Warmth",
+    "Gut gurgle",
+    "Quiet settle"
+  ];
+
+  const SAIC_DATA = {
+    Safety: {
+      title: "Safety — Biological survival & somatic integrity",
+      prompt: "\"I will be physically harmed, starved, depleted, or overwhelmed.\""
+    },
+    Agency: {
+      title: "Agency — Operant capacity & boundary enforcement",
+      prompt: "\"I am trapped, forced, powerless, or my boundaries are erased.\""
+    },
+    Identity: {
+      title: "Identity — Coherence of self-model & integrity",
+      prompt: "\"I am flawed, exposed, inadequate, or failing my own standards.\""
+    },
+    Connection: {
+      title: "Connection — Relational attachment & belonging",
+      prompt: "\"I am unloved, misunderstood, cast out, or relationally severed.\""
+    }
+  };
+
+  const ANNOTATIONS = {
+    R1: "Background irritation (-1, 6)",
+    R2: "Noticeable alarm (-2, 7)",
+    R3: "Significant bracing (-3, 8)",
+    R4: "High threat spike (-4, 9)",
+    R5: "Full SAIC Redline (-5, 10)",
+    Y1: "Focus / Interest (+1, 6)",
+    Y2: "Engaged energy (+2, 7)",
+    Y3: "Drive / Momentum (+3, 8)",
+    Y4: "High activation (+4, 9)",
+    Y5: "Peak excitement (+5, 10)",
+    B1: "Quiet / Disengaged (-1, 4)",
+    B2: "Low / Flat (-2, 3)",
+    B3: "Heavy fatigue (-3, 2)",
+    B4: "Depleted (-4, 1)",
+    B5: "Shutdown / Collapse (-5, 0)",
+    G1: "Natural Ease (+1, 4)",
+    G2: "Settled (+2, 3)",
+    G3: "Grounded / Calm (+3, 2)",
+    G4: "Deep rest (+4, 1)",
+    G5: "Deep Absorption (+5, 0)"
+  };
+
+  const GUIDE_ENTRIES = [
+    // 1. TIP & Crisis Response
+    {
+      cat: "TIP & Crisis Response",
+      title: "Post-Call Looping: \"Things I wish I had said\"",
+      step1: "Interpersonal + Criticism / Correction + [Memory Loop]",
+      saic: "Agency (trying to retroactively fix/control their pain) + Identity (responder standard)",
+      reality: "Event is over, Adult now (Steady presence matters more than perfect phrasing; grief isn't solved by a sentence.)"
+    },
+    {
+      cat: "TIP & Crisis Response",
+      title: "Raw Scene Residue (Bodies, smells, sirens, intense emotion)",
+      step1: "Environmental + Sensory / Scene (+ [Memory Loop] if off-shift)",
+      saic: "Safety (autonomic threat echo) + Agency (witnessed tragedy you couldn't stop)",
+      reality: "Safe room, Event is over (I am off-shift, physically safe, and in my own home.)"
+    },
+    {
+      cat: "TIP & Crisis Response",
+      title: "Survivor's Story Hooking Personal History",
+      step1: "Personal + Sensory / Scene + [Memory Loop]",
+      saic: "Connection + Safety",
+      reality: "Adult now, Safe room (That is their crisis and old memory; my present life is intact.)"
+    },
+    // 2. Presentations, Social Dynamics & Relational Guilt
+    {
+      cat: "Presentations, Social Dynamics & Relational Guilt",
+      title: "Worrying I Hurt Someone's Feelings or Excluded Them (\"Did I say/do something wrong?\")",
+      step1: "Interpersonal (or Personal) + Criticism / Correction + [Memory Loop]",
+      saic: "Identity (fear of being thoughtless/harmful; failing own standard of care) + Connection (fear of relational fracture or rupture)",
+      reality: "Event is over, Old wiring ≠ Failure, Adult now (Hyper-vigilant mind-reading cannot rewrite interactions. If real repair is warranted, adult communication is direct; ruminative guilt is an old defense loop.)"
+    },
+    {
+      cat: "Presentations, Social Dynamics & Relational Guilt",
+      title: "Post-Presentation Looping (\"Wish I had said / not said\")",
+      step1: "Personal (or Interpersonal) + Criticism / Correction + [Memory Loop]",
+      saic: "Identity (exposed, imprecise, or short of own standard) + Connection (social standing)",
+      reality: "Event is over, Old wiring ≠ Failure (The room has already moved on; replaying a closed event cannot edit it.)"
+    },
+    {
+      cat: "Presentations, Social Dynamics & Relational Guilt",
+      title: "Receiving Feedback, Blame, or Scrutiny",
+      step1: "Interpersonal + Criticism / Correction",
+      saic: "Identity (flawed/inadequate) + Safety (status threat)",
+      reality: "Adult now, Old wiring ≠ Failure"
+    },
+    {
+      cat: "Presentations, Social Dynamics & Relational Guilt",
+      title: "Unanswered Message / Vague Plan / Waiting on Verdict",
+      step1: "Interpersonal + Silence / Ambiguity",
+      saic: "Connection (relational breach) + Agency (inability to prepare)",
+      reality: "Safe room, I have options"
+    },
+    // 3. Aging Parents, Dementia & Sibling Dynamics
+    {
+      cat: "Aging Parents, Dementia & Sibling Dynamics",
+      title: "Parent with Dementia (Repetition, confusion, resistance to care)",
+      step1: "Interpersonal + Plan / System Friction (or Boundary / Demand)",
+      saic: "Identity (forced role reversal: losing the child seat and becoming the parent's caretaker) + Agency (helpless to halt decline) + Connection (ambiguous loss of the parent you knew)",
+      reality: "Adult now, Event is over (Neurology is driving their behavior, not stubbornness. Stepping into the caretaker seat is a real role shift, not a personal failing.)"
+    },
+    {
+      cat: "Aging Parents, Dementia & Sibling Dynamics",
+      title: "Parent Health Scare / Medical Decline / ER Visit",
+      step1: "Interpersonal + Plan / System Friction (+ Fast Reflex if sudden)",
+      saic: "Safety (dissolution of the primal safety anchor; mortality) + Identity (stepping into the senior decision-maker role) + Agency (cannot fix biology)",
+      reality: "Safe room, Adult now, I have options (I am no longer a dependent child needing their protection to survive; I am a capable adult navigating reality.)"
+    },
+    {
+      cat: "Aging Parents, Dementia & Sibling Dynamics",
+      title: "Siblings Checked Out / Unequal Load / Second-Guessing You",
+      step1: "Interpersonal + Boundary / Demand (or Silence / Ambiguity)",
+      saic: "Agency (trapped carrying the load alone) + Identity (taken for granted / judged) + Connection",
+      reality: "I have options, Adult now (Their avoidance or differing capacity is not my moral failure.)"
+    },
+    {
+      cat: "Aging Parents, Dementia & Sibling Dynamics",
+      title: "Replaying a Tense Family Call or Care Decision Later",
+      step1: "Interpersonal + Criticism / Correction + [Memory Loop]",
+      saic: "Identity + Agency",
+      reality: "Safe room, Event is over"
+    },
+    // 4. Parenting & Kids' Challenges
+    {
+      cat: "Parenting & Kids' Challenges",
+      title: "Kids' Mental Health Challenges / Parental Self-Blame (\"Did I cause this by being reactive or angry in the past?\")",
+      step1: "Personal + Criticism / Correction + [Memory Loop] (or Interpersonal)",
+      saic: "Identity (omnipotent guilt: \"I broke them; a reactive or angry moment caused this\") + Agency (falsely assuming sole causal control over complex biology) + Connection + Safety",
+      reality: "Old wiring ≠ Failure, Adult now, Event is over (A child's mental health is complex, multi-factorial neurobiology and genetics—not caused by an imperfect reactive moment or snapped anger. Steady presence today is what matters; omnipotent self-blame is old guilt wiring.)"
+    },
+    {
+      cat: "Parenting & Kids' Challenges",
+      title: "Short Reply, Eye Roll, or Feeling Dismissed at Home (Note: Rarely an issue with kids—they communicate honestly—more applicable to external/work interactions or general home friction if it ever occurs)",
+      step1: "Interpersonal + Tone / Dismissal",
+      saic: "Connection (relational disconnect) + Identity (diminished)",
+      reality: "Event is over, Adult now"
+    },
+    // 5. World Events, Moral Outrage & Personal Meta-Loops
+    {
+      cat: "World Events, Moral Outrage & Personal Meta-Loops",
+      title: "Grotesque Injustice on the News (ICE, Gaza, Ukraine) — \"Calm = Complicity\"",
+      step1: "Environmental + Sensory / Scene",
+      saic: "Identity (moral integrity: \"if I'm calm, I don't care\") + Agency (helplessness at scale)",
+      reality: "Calm ≠ Complicity, Safe room (Physiological bracing in my living room does not help anyone; clarity preserves capacity.)"
+    },
+    {
+      cat: "World Events, Moral Outrage & Personal Meta-Loops",
+      title: "The \"Third Arrow\" (Chagrin at Getting Triggered So Hard)",
+      step1: "Personal + Criticism / Correction + [Memory Loop] + [Third Arrow]",
+      saic: "Identity (failing own standards of self-regulation)",
+      reality: "Old wiring ≠ Failure, Adult now (An automatic autonomic spike is old hardware firing, not a character flaw.)"
+    },
+    {
+      cat: "World Events, Moral Outrage & Personal Meta-Loops",
+      title: "Careless Mistake / Forgot Something / Broke Something",
+      step1: "Personal + Criticism / Correction",
+      saic: "Identity (incompetence) + Agency",
+      reality: "Old wiring ≠ Failure, Event is over"
+    },
+    {
+      cat: "World Events, Moral Outrage & Personal Meta-Loops",
+      title: "Own Fatigue, Brain Fog, or Unexplained Body Twinge",
+      step1: "Personal + Plan / System Friction (+ Fast Reflex if sharp)",
+      saic: "Safety (physical vulnerability) + Agency (loss of capacity)",
+      reality: "Safe room, I have options"
+    },
+    {
+      cat: "World Events, Moral Outrage & Personal Meta-Loops",
+      title: "Overwhelming To-Do List / Messy Space / Task Paralysis",
+      step1: "Personal + Boundary / Demand",
+      saic: "Agency (trapped/coerced by obligations)",
+      reality: "I have options, Adult now"
+    }
+  ];
+
+  // --- SESSION STATE ---
+  let state = createFreshState();
+  let lastSavedMarkdown = "";
+
+  function createFreshState() {
+    return {
+      t0: Date.now(),
+      tCode1: null,
+      tCode2: null,
+      tCode3: null,
+      domain: "",
+      pattern: "",
+      modifiers: [],
+      code1: "",
+      sensations: [],
+      locations: [],
+      charge: null,
+      saic: [],
+      realities: [],
+      softens: [],
+      loops: "few",
+      code2: "",
+      code3: "",
+      releases: []
+    };
+  }
+
+  // --- INITIALIZATION ---
+  function init() {
+    renderSingleChips("domain-chips", DOMAINS, "domain", updateStep1Badge);
+    renderSingleChips("pattern-chips", PATTERNS, "pattern", updateStep1Badge);
+    renderMultiChips("modifier-chips", MODIFIERS, "modifiers", "warn", updateStep1Badge);
+
+    renderTarget("target-code1", "code1");
+    renderMultiChips("sensation-chips", SENSATIONS, "sensations");
+    renderMultiChips("location-chips", LOCATIONS, "locations");
+    renderChargeStrip();
+
+    renderMultiChips("saic-chips", Object.keys(SAIC_DATA), "saic", "saic-chip", renderSaicHints);
+
+    renderMultiChips("reality-chips", REALITIES, "realities", "green-chip");
+    renderMultiChips("soften-chips", SOFTENS, "softens", "green-chip");
+    initLoopControl();
+    renderTarget("target-code2", "code2");
+
+    renderTarget("target-code3", "code3");
+    renderMultiChips("release-chips", RELEASES, "releases", "green-chip");
+
+    renderGuide();
+    updateLogCount();
+    updateTelemetry();
+  }
+
+  function renderSingleChips(containerId, items, stateKey, onChange) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = "";
+    items.forEach(item => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "chip" + (state[stateKey] === item ? " active" : "");
+      btn.textContent = item;
+      btn.onclick = () => {
+        state[stateKey] = state[stateKey] === item ? "" : item;
+        renderSingleChips(containerId, items, stateKey, onChange);
+        if (onChange) onChange();
+      };
+      el.appendChild(btn);
+    });
+  }
+
+  function renderMultiChips(containerId, items, stateKey, extraClass = "", onChange) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = "";
+    items.forEach(item => {
+      const active = state[stateKey].includes(item);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `chip ${extraClass} ${active ? "active" : ""}`.trim();
+      btn.textContent = item;
+      btn.onclick = () => {
+        if (active) {
+          state[stateKey] = state[stateKey].filter(x => x !== item);
+        } else {
+          state[stateKey].push(item);
+        }
+        renderMultiChips(containerId, items, stateKey, extraClass, onChange);
+        if (onChange) onChange();
+      };
+      el.appendChild(btn);
+    });
+  }
+
+  function updateStep1Badge() {
+    const parts = [state.domain, state.pattern, ...state.modifiers].filter(Boolean);
+    document.getElementById("step1-badge").textContent = parts.length ? parts.join(" · ") : "Select source";
+  }
+
+  function renderChargeStrip() {
+    const el = document.getElementById("charge-strip");
+    el.innerHTML = "";
+    for (let i = 1; i <= 10; i++) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "charge-btn" + (i > 5 ? " hot" : "") + (state.charge === i ? " active" : "");
+      btn.textContent = i;
+      btn.onclick = () => {
+        state.charge = i;
+        renderChargeStrip();
+        document.getElementById("charge-alert").style.display = i > 5 ? "block" : "none";
+      };
+      el.appendChild(btn);
+    }
+  }
+
+  function renderSaicHints() {
+    const badge = document.getElementById("saic-badge");
+    badge.textContent = state.saic.length ? state.saic.join(" + ") : "Multi-select";
+    const container = document.getElementById("saic-hints");
+    container.innerHTML = "";
+    state.saic.forEach(key => {
+      const info = SAIC_DATA[key];
+      const div = document.createElement("div");
+      div.className = "saic-hint-card";
+      div.innerHTML = `<strong>${info.title}</strong><br>${info.prompt}`;
+      container.appendChild(div);
+    });
+  }
+
+  function initLoopControl() {
+    document.querySelectorAll("#loop-segmented .seg-btn").forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll("#loop-segmented .seg-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.loops = btn.dataset.val;
+        updateTelemetry();
+      };
+    });
+  }
+
+  // --- 4-QUADRANT x 5-RING SVG TARGET ---
+  // Top-Left: Red (Neg Valence, High Arousal)
+  // Top-Right: Yellow (Pos Valence, High Arousal)
+  // Bottom-Left: Blue (Neg Valence, Low Arousal)
+  // Bottom-Right: Green (Pos Valence, Low Arousal)
+  function renderTarget(containerId, stateKey) {
+    const container = document.getElementById(containerId);
+    const size = 280;
+    const cx = size / 2;
+    const cy = size / 2;
+    const maxR = 128;
+    const ringStep = maxR / 5;
+
+    const quadrants = [
+      { code: "R", startAngle: 180, endAngle: 270, base: "#f85149" },
+      { code: "Y", startAngle: 270, endAngle: 360, base: "#d29922" },
+      { code: "G", startAngle: 0,   endAngle: 90,  base: "#3fb950" },
+      { code: "B", startAngle: 90,  endAngle: 180, base: "#58a6ff" }
+    ];
+
+    let svg = `<svg viewBox="0 0 ${size} ${size}" class="target-svg">`;
+
+    // Draw outer to inner rings so inner clicks layer cleanly on top
+    for (let ring = 5; ring >= 1; ring--) {
+      const rOuter = ring * ringStep;
+      const rInner = (ring - 1) * ringStep;
+      const opacity = 0.16 + ring * 0.13;
+
+      quadrants.forEach(q => {
+        const fullCode = `${q.code}${ring}`;
+        const isSelected = state[stateKey] === fullCode;
+        const d = describeArcWedge(cx, cy, rInner, rOuter, q.startAngle, q.endAngle);
+        const stroke = isSelected ? "#ffffff" : "#0d1117";
+        const strokeWidth = isSelected ? 2.5 : 1.2;
+        const fillOpacity = isSelected ? 0.95 : opacity;
+
+        // Label placement
+        const midAngle = ((q.startAngle + q.endAngle) / 2) * (Math.PI / 180);
+        const midR = (rInner + rOuter) / 2;
+        const lx = cx + midR * Math.cos(midAngle);
+        const ly = cy + midR * Math.sin(midAngle);
+
+        svg += `<path d="${d}" fill="${q.base}" fill-opacity="${fillOpacity}" stroke="${stroke}" stroke-width="${strokeWidth}" class="wedge" onclick="selectCode('${stateKey}', '${fullCode}')"></path>`;
+        svg += `<text x="${lx}" y="${ly}" fill="#ffffff" font-size="10" font-weight="${isSelected ? '800' : '600'}" text-anchor="middle" dominant-baseline="central" pointer-events="none">${fullCode}</text>`;
+      });
+    }
+
+    // Crosshairs
+    svg += `<line x1="${cx}" y1="4" x2="${cx}" y2="${size - 4}" stroke="#30363d" stroke-width="1.5" pointer-events="none"/>`;
+    svg += `<line x1="4" y1="${cy}" x2="${size - 4}" y2="${cy}" stroke="#30363d" stroke-width="1.5" pointer-events="none"/>`;
+    svg += `</svg>`;
+
+    container.innerHTML = svg;
+  }
+
+  function describeArcWedge(cx, cy, rIn, rOut, startDeg, endDeg) {
+    const rad = Math.PI / 180;
+    const a1 = startDeg * rad;
+    const a2 = endDeg * rad;
+    const x1Out = cx + rOut * Math.cos(a1);
+    const y1Out = cy + rOut * Math.sin(a1);
+    const x2Out = cx + rOut * Math.cos(a2);
+    const y2Out = cy + rOut * Math.sin(a2);
+
+    if (rIn === 0) {
+      return `M ${cx} ${cy} L ${x1Out} ${y1Out} A ${rOut} ${rOut} 0 0 1 ${x2Out} ${y2Out} Z`;
+    }
+    const x1In = cx + rIn * Math.cos(a1);
+    const y1In = cy + rIn * Math.sin(a1);
+    const x2In = cx + rIn * Math.cos(a2);
+    const y2In = cy + rIn * Math.sin(a2);
+    return `M ${x1In} ${y1In} L ${x1Out} ${y1Out} A ${rOut} ${rOut} 0 0 1 ${x2Out} ${y2Out} L ${x2In} ${y2In} A ${rIn} ${rIn} 0 0 0 ${x1In} ${y1In} Z`;
+  }
+
+  function selectCode(stateKey, code) {
+    const now = Date.now();
+    state[stateKey] = code;
+    if (stateKey === "code1" && !state.tCode1) state.tCode1 = now;
+    if (stateKey === "code2") state.tCode2 = now;
+    if (stateKey === "code3") state.tCode3 = now;
+
+    renderTarget(`target-${stateKey}`, stateKey);
+    document.getElementById(`${stateKey}-badge`).textContent = code;
+    document.getElementById(`readout-${stateKey}`).textContent = `${code}: ${ANNOTATIONS[code] || ""}`;
+
+    if (stateKey === "code1" && (code === "R4" || code === "R5")) {
+      document.getElementById("charge-alert").style.display = "block";
+    }
+    updateTelemetry();
+  }
+
+  function formatDuration(ms) {
+    if (!ms || ms < 0) return "0m15s";
+    const totalSec = Math.max(5, Math.round(ms / 1000));
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m}m${String(s).padStart(2, "0")}s`;
+  }
+
+  function buildProcessString() {
+    const c1 = state.code1 || "code1";
+    const c2 = state.code2 || state.code1 || "code2";
+    const c3 = state.code3 || "code3";
+    const t1 = state.tCode1 || state.t0;
+    const t2 = state.tCode2 || Date.now();
+    const t3 = state.tCode3 || Date.now();
+
+    const d1 = formatDuration(t2 - t1);
+    const d2 = formatDuration(t3 - t2);
+    return `${c1} --> ${d1} --> ${c2}:${state.loops} --> ${d2} --> ${c3}`;
+  }
+
+  function updateTelemetry() {
+    document.getElementById("telemetry-preview").textContent = buildProcessString();
+  }
+
+  // --- SAVE & MARKDOWN EXPORT ---
+  function compileMarkdown(s, isoDate, processStr) {
+    const triggerTags = [s.domain, s.pattern, ...s.modifiers].filter(Boolean).join(" · ") || "Unspecified";
+    const bodyFeel = s.sensations.length ? s.sensations.join(", ") : "—";
+    const bodyLoc = s.locations.length ? s.locations.join(", ") : "—";
+    const saicList = s.saic.length ? s.saic.join(", ") : "None";
+    const realityList = [...s.realities, s.realityNote].filter(Boolean).join("; ") || "—";
+    const softenList = s.softens.length ? s.softens.join(", ") : "—";
+    const releaseList = s.releases.length ? s.releases.join(", ") : "Quiet settle";
+
+    return `---
+type: somatic-refactor-log
+date: ${isoDate}
+domain: ${s.domain || "null"}
+pattern: ${s.pattern || "null"}
+modifiers: [${s.modifiers.join(", ")}]
+saic: [${s.saic.join(", ")}]
+code_start: ${s.code1 || "null"}
+charge_start: ${s.charge || "null"}
+code_mid: ${s.code2 || s.code1 || "null"}
+loops: ${s.loops}
+code_end: ${s.code3 || "null"}
+release: [${releaseList}]
+process: "${processStr}"
+---
+
+0. Calm
+1. **When** [${triggerTags}] happened: *${s.factsNote || "Logged via quick-tap."}*
+2. **My body felt** ${bodyFeel} **in** ${bodyLoc} — **code:** \`${s.code1 || "—"}\` (charge: \`${s.charge || "—"}/10\`)
+3. **My system assumed** *(SAIC: ${saicList})*: *${s.assumptionNote || "Implicit SAIC threat pattern."}*
+4. **In reality:** ${realityList}. **Practice body feeling:** ${softenList} (\`${s.code2 || s.code1 || "—"}:${s.loops}\`)
+5. **Re-check code:** \`${s.code3 || "—"}\` — **Release:** ${releaseList}
+6. **Calm again. Done.**
+`;
+  }
+
+  function finishSession() {
+    if (!state.tCode3) state.tCode3 = Date.now();
+    const snapshot = {
+      ...state,
+      factsNote: document.getElementById("facts-note").value.trim(),
+      assumptionNote: document.getElementById("assumption-note").value.trim(),
+      realityNote: document.getElementById("reality-note").value.trim()
+    };
+    const isoDate = new Date().toISOString();
+    const processStr = buildProcessString();
+    const md = compileMarkdown(snapshot, isoDate, processStr);
+    lastSavedMarkdown = md;
+
+    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
+    logs.unshift({ id: isoDate, process: processStr, trigger: `${snapshot.domain} · ${snapshot.pattern}`, md });
+    localStorage.setItem("somatic_refactor_logs", JSON.stringify(logs));
+    updateLogCount();
+
+    copyText(md);
+    document.getElementById("final-telemetry").textContent = processStr;
+    document.getElementById("workflow").style.display = "none";
+    document.getElementById("rest-screen").style.display = "block";
+    window.scrollTo(0, 0);
+  }
+
+  function copyLastMarkdown() {
+    if (lastSavedMarkdown) copyText(lastSavedMarkdown);
+  }
+
+  function resetSession() {
+    state = createFreshState();
+    document.getElementById("facts-note").value = "";
+    document.getElementById("assumption-note").value = "";
+    document.getElementById("reality-note").value = "";
+    document.getElementById("charge-alert").style.display = "none";
+    document.getElementById("step1-badge").textContent = "Select source";
+    document.getElementById("code1-badge").textContent = "Tap target";
+    document.getElementById("code2-badge").textContent = "Optional mid-code";
+    document.getElementById("code3-badge").textContent = "Tap final state";
+    document.getElementById("saic-badge").textContent = "Multi-select";
+    document.getElementById("saic-hints").innerHTML = "";
+    document.querySelectorAll("#loop-segmented .seg-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.val === "few");
+    });
+    init();
+    document.getElementById("rest-screen").style.display = "none";
+    document.getElementById("workflow").style.display = "flex";
+    window.scrollTo(0, 0);
+  }
+
+  // --- FIELD GUIDE & HISTORY MODALS ---
+  function renderGuide() {
+    const q = (document.getElementById("guide-search").value || "").toLowerCase();
+    const list = document.getElementById("guide-list");
+    list.innerHTML = "";
+    GUIDE_ENTRIES.filter(item =>
+      !q ||
+      item.title.toLowerCase().includes(q) ||
+      item.cat.toLowerCase().includes(q) ||
+      item.step1.toLowerCase().includes(q) ||
+      item.saic.toLowerCase().includes(q) ||
+      item.reality.toLowerCase().includes(q)
+    ).forEach(item => {
+      const div = document.createElement("div");
+      div.className = "guide-item";
+      div.innerHTML = `
+        <div style="font-size:0.74rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;">${item.cat}</div>
+        <div class="guide-title">${item.title}</div>
+        <div class="guide-meta">
+          <span>Step 1:</span> ${item.step1}<br>
+          <b>SAIC:</b> ${item.saic}<br>
+          <em>Reality:</em> ${item.reality}
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  function updateLogCount() {
+    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
+    document.getElementById("log-count").textContent = logs.length;
+  }
+
+  function openHistory() {
+    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
+    const list = document.getElementById("history-list");
+    list.innerHTML = logs.length ? "" : `<p style="color:var(--muted); font-size:0.88rem;">No saved logs yet.</p>`;
+    logs.forEach((log, idx) => {
+      const div = document.createElement("div");
+      div.className = "guide-item";
+      div.innerHTML = `
+        <div class="guide-title">${log.id.slice(0, 10)} — ${log.trigger}</div>
+        <div class="guide-meta" style="font-family:monospace; margin-bottom:8px;">${log.process}</div>
+        <button class="icon-btn" onclick="copyLogIndex(${idx})">Copy Markdown</button>
+      `;
+      list.appendChild(div);
+    });
+    openModal("history-modal");
+  }
+
+  function copyLogIndex(idx) {
+    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
+    if (logs[idx]) copyText(logs[idx].md);
+  }
+
+  function exportAllMarkdown() {
+    const logs = JSON.parse(localStorage.getItem("somatic_refactor_logs") || "[]");
+    if (!logs.length) return;
+    copyText(logs.map(l => l.md).join("\n---\n\n"));
+  }
+
+  function openModal(id) { document.getElementById(id).classList.add("open"); }
+  function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+  function closeModalOnBg(e, id) { if (e.target.id === id) closeModal(id); }
+
+  function copyText(str) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(str).then(() => showToast("Copied Obsidian Markdown"));
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = str;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      showToast("Copied Obsidian Markdown");
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2000);
+  }
+
+  // Register Service Worker for offline PWA support
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+
+  init();
+</script>
+</body>
+</html>

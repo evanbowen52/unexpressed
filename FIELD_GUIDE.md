@@ -58,9 +58,18 @@ Use this guide when sitting down to run a reconsolidation pass. Find the closest
 
 ---
 
-## 6. Fast Diagnostic: How to Map Any New Trigger in 15 Seconds
+## 6. Fast Diagnostic: Pre-Refactor Gate & 15-Second Trigger Map
 
-When a novel trigger hits and isn't in the tables above, ask three questions:
+### Step 0: The Pre-Refactor Gate (Wave vs. Loop)
+Before opening the app or moving into PFC analysis, keep your behavioral steering wheel steady and let the somatic sensation move through your body unfiltered first. Then check the fork:
+
+* **Is it a Clean Affective Wave?** *(Grief on a crisis call, sadness over a parent's decline, moral anger at real cruelty, tenderness, or frustration that crests and metabolizes once felt without resistance.)*
+  * **Action:** **Do not refactor it.** Do not force immediate calm or over-analyze it. Regulation means staying behaviorally steady while real human emotion passes through the body—not eliminating feeling.
+* **Is it a Stuck Predictive Loop?** *(The sensation keeps re-firing because a false threat story, omnipotent self-blame, `[Memory Loop]`, or `[Third Arrow]` judgment is feeding it.)*
+  * **Action:** **Run the Somatic Refactor** using the three diagnostic questions below.
+
+### 15-Second Trigger Map (For Stuck Loops)
+When a stuck loop hits and isn't in the tables above, ask three questions:
 
 1. **Where did the input originate?** *(Step 1 Domain)*
    * Another human's action, words, or absence $\rightarrow$ **`Interpersonal`**
@@ -80,6 +89,7 @@ When a novel trigger hits and isn't in the tables above, ask three questions:
 ## 7. Global Conclusions & Meta-Observations
 
 ### Core Daily Anchors
+* **Feel the wave; refactor the loop.**
 * **Calm is capacity, not complicity.**
 * **Separate influence from control.**
 * **Arousal is information, not failure.**
@@ -89,14 +99,15 @@ When a novel trigger hits and isn't in the tables above, ask three questions:
 * **Hyper-Conscientiousness & Omnipotent Causal Framing (`Identity` + `Agency`):** Across crises, parenting, caretaking, and domestic logistics, the nervous system defaults to assuming 100% causal responsibility—treating unresolved pain, complex biology, or minor schedule drift as personal failures to fix or guarantee.
 * **Arousal-as-Moral-Proof (`Calm = Complicity`):** Sympathetic bracing is routinely mistaken for ethical seriousness and care. Physiological calm is misread as negligence rather than the baseline prerequisite for sustained, effective action.
 * **High Self-Surveillance (`[Third Arrow]`):** Experiencing an intense autonomic spike violates an internal standard of composure, immediately triggering secondary `Identity` chagrin on top of a fast, legacy hardware reflex.
-* **Functional Stoicism Over External Venting:** Under asymmetric load or interpersonal friction, the reflex turns inward toward duty, self-scrutiny, or silent somatic holding rather than entitlement or outward blame.
+* **Functional Stoicism & Premature Cognitive Bypass Risk:** Under asymmetric load or interpersonal friction, the reflex turns inward toward duty, self-scrutiny, or silent somatic holding rather than outward blame. A secondary risk is jumping immediately into PFC analysis or forced calming—cutting off valid, metabolizable human emotions (grief, sadness, anger, tenderness) before they finish moving through the body.
 
 ### Relational & Worldview Signatures
 * **Protective Attunement & Deficit Absorption:** Strong caretaking orientation paired with radar-like sensitivity to micro-ruptures. When others under-function (siblings) or move at a different pace (family dinner plating), the default reflex is to absorb the friction rather than tolerate the discomfort of letting a ball drop or stating an explicit boundary.
 * **Agency-Heavy Ethics (`Control as Safety`):** An implicit operating rule that preparation, careful speech, and tight logistical execution can prevent relational rupture and protect vulnerable people.
 
 ### Structural Antidotes & Rules of Thumb
+* **Feel the Wave Before Analyzing:** Allow acute, reality-congruent emotions to crest and pass through the body while maintaining steady adult behavior. Only engage the Somatic Refactor when an emotion stalls into a repetitive threat prediction or `[Memory Loop]`.
 * **Right-Size the Causal Footprint:** Separate *influence* (showing up steadily, cooking the meal, offering presence) from *control* (fixing multi-factorial neurobiology, another adult's choices, or others' pacing).
 * **Arousal Is Information, Not Failure:** Treat autonomic spikes as live diagnostic data indicating where a boundary, caretaking load, or old threat rule was tripped—not a character verdict.
 * **Close Loops Without Retroactive Editing:** Once an interaction, presentation, or crisis call ends and any concrete lesson is extracted, halt simulation replay.
-* **Somatic Grounding Rule:** Internal physiological bracing in isolation never alters external reality, speeds up a timeline, or edits past events. Baseline calm must be restored before genuine adult agency and clean communication can occur.
+* **Somatic Grounding Rule:** Regulation is behavioral steadiness in the presence of emotion, not emotional flatness. While real affect should be allowed to move through the body, chronic physiological bracing in isolation never alters external reality, speeds up a timeline, or edits past events—and must be released so genuine adult agency and clean communication can operate.

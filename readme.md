@@ -49,6 +49,106 @@ A zero-backend, offline-first Progressive Web App designed for **post-regulation
 - [x] **Simplify Quadrant Target from 5 Rings to 3 Rings:** Reduced rings to Mild/Moderate/High (`R1–R3`, `Y1–Y3`, `B1–B3`, `G1–G3`) with larger `maxR / 3` tap targets for thumb-friendly mobile accuracy.
 - [x] **Decommission Obsidian Export & Lockout:** Stripped out Obsidian vault dependency and removed the forced terminal rest screen lockout.
 
-### Phase 5: PWA Polish & Deployment
-- [ ] **Custom App Icons & Cache:** Generate minimalist `icon-192.png` / `icon-512.png` and wire into `manifest.json` and `sw.js`.
-- [ ] **GitHub Pages Deployment:** Connect remote repository origin and publish live PWA on GitHub Pages.
+### Phase 5: PWA Polish & Deployment (Completed)
+- [x] **GitHub Pages Deployment:** Published live PWA via GitHub Pages at `https://evanbowen52.github.io/unexpressed/`.
+- [x] **Network-First Service Worker:** Upgraded to `v2` service worker with network-first caching and 1-tap repo sync.
+- [ ] **Custom App Icons:** Generate minimalist `icon-192.png` / `icon-512.png` and wire into `manifest.json`.
+
+---
+
+## 4. Future Roadmap: Multi-User Cloud Architecture (Supabase Migration)
+
+When expanding the application from single-user local storage to a multi-user, cross-device platform, **Supabase (PostgreSQL + Auth + Realtime)** is the designated backend of choice. Somatic refactor logs and threat models represent sensitive personal psychological data, requiring strict multi-tenant isolation, strong encryption, and offline-first durability.
+
+### 4.1. Authentication & Onboarding
+* **Passwordless Auth:** Supabase Auth with Email Magic Links or OAuth providers (GitHub/Google) to eliminate password friction.
+* **Anonymous Session Promotion:** Enable guests to use the Pattern Atlas immediately via `localStorage`. When the user chooses to create an account, an onboarding migration hook automatically upserts the local `localStorage` Atlas into their newly created cloud database.
+
+### 4.2. Relational Database Schema (PostgreSQL)
+
+```sql
+-- 1. Profiles & Global User Settings
+create table public.profiles (
+  id uuid references auth.users on delete cascade primary key,
+  display_name text,
+  fast_diagnostic text,
+  global_conclusions text,
+  created_at timestamptz default timezone('utc'::text, now()) not null,
+  updated_at timestamptz default timezone('utc'::text, now()) not null
+);
+
+-- 2. Atlas Sections
+create table public.sections (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users on delete cascade not null,
+  title text not null,
+  sort_order int default 0 not null,
+  created_at timestamptz default timezone('utc'::text, now()) not null,
+  updated_at timestamptz default timezone('utc'::text, now()) not null
+);
+
+-- 3. Individual Patterns & Scenarios
+create table public.patterns (
+  id uuid default gen_random_uuid() primary key,
+  section_id uuid references public.sections on delete cascade not null,
+  user_id uuid references auth.users on delete cascade not null,
+  title text not null,
+  domain text not null,                    -- 'Interpersonal' | 'Environmental' | 'Personal'
+  pattern_type text not null,              -- 'Criticism / Correction' | 'Boundary / Demand' | etc.
+  modifiers text[] default '{}'::text[],   -- ARRAY['Memory Loop', 'Third Arrow', ...]
+  saic text[] default '{}'::text[],        -- ARRAY['Safety', 'Agency', 'Identity', 'Connection']
+  reality text not null,                   -- Anchor statement + parenthetical rationale
+  notes text,                              -- Personal reflective notes
+  sort_order int default 0 not null,
+  created_at timestamptz default timezone('utc'::text, now()) not null,
+  updated_at timestamptz default timezone('utc'::text, now()) not null
+);
+
+-- 4. Somatic Reconsolidation Session Telemetry
+create table public.session_logs (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users on delete cascade not null,
+  pattern_id uuid references public.patterns on delete set null,
+  code1 text not null,                     -- e.g. "R3"
+  code2 text not null,                     -- e.g. "Y1"
+  code3 text not null,                     -- e.g. "G1"
+  loops text not null,                     -- "few" | "moderate" | "persistent"
+  sensations text[] default '{}'::text[],
+  locations text[] default '{}'::text[],
+  releases text[] default '{}'::text[],
+  telemetry_summary text not null,         -- "R3 --> 00:14 --> Y1:moderate --> 00:32 --> G1"
+  created_at timestamptz default timezone('utc'::text, now()) not null
+);
+```
+
+### 4.3. Row-Level Security (RLS) Policies
+Because somatic interoception records require complete privacy, Row-Level Security must be enabled and enforced across all tables:
+
+```sql
+alter table public.profiles enable row level security;
+alter table public.sections enable row level security;
+alter table public.patterns enable row level security;
+alter table public.session_logs enable row level security;
+
+-- Enforce strict single-owner access:
+create policy "Users own their profile" on public.profiles
+  for all using (auth.uid() = id);
+
+create policy "Users own their sections" on public.sections
+  for all using (auth.uid() = user_id);
+
+create policy "Users own their patterns" on public.patterns
+  for all using (auth.uid() = user_id);
+
+create policy "Users own their session logs" on public.session_logs
+  for all using (auth.uid() = user_id);
+```
+
+### 4.4. Offline-First Sync Engine (Local-First Durability)
+* **Zero UI Latency:** The UI continues writing to `IndexedDB` or `localStorage` first; users never wait for a network round-trip while logging an acute somatic shift.
+* **Background Sync Queue:** A lightweight sync coordinator queues dirty mutations and flushes to Supabase via `@supabase/supabase-js` whenever network connectivity is active.
+* **Conflict Resolution:** Last-Write-Wins (LWW) driven by PostgreSQL `updated_at` timestamps.
+
+### 4.5. Data Sovereignty & Portability
+* Retain the existing Markdown bridge (`generateAtlasMarkdown()` and `parseFieldGuideMarkdown()`).
+* Even with cloud sync enabled, users retain one-tap **"Download FIELD_GUIDE.md"** and **"Copy Markdown"** functionality to ensure complete independence from the hosted service.

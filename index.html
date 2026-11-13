@@ -54,8 +54,21 @@
       gap: 8px;
     }
 
-    .gate-banner {
+    .header-branding {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .app-title {
       font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .gate-banner {
+      font-size: 0.75rem;
       font-weight: 600;
       color: var(--green);
       letter-spacing: 0.01em;
@@ -480,8 +493,62 @@
     .conclusions-title { font-size: 0.92rem; font-weight: 700; color: var(--text); }
     .status-pill { font-size: 0.72rem; color: var(--green); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; }
     .conclusions-sub { font-size: 0.81rem; color: var(--muted); margin: 0 0 10px; line-height: 1.4; }
-    .conclusions-textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 10px 12px; font-size: 0.88rem; font-family: inherit; line-height: 1.45; resize: vertical; }
+    .conclusions-textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 12px 14px; font-size: 0.88rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; line-height: 1.5; resize: vertical; }
     .conclusions-textarea:focus { outline: none; border-color: var(--accent); }
+    .conclusions-rendered-view {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 12px 14px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      cursor: pointer;
+      min-height: 90px;
+      transition: border-color 0.15s ease;
+    }
+    .conclusions-rendered-view:hover {
+      border-color: rgba(88, 166, 255, 0.4);
+    }
+    .md-h1, .md-h2, .md-h3, .md-h4 {
+      font-weight: 700;
+      color: #fff;
+      margin: 12px 0 6px 0;
+      line-height: 1.3;
+    }
+    .md-h1, .md-h2 { font-size: 0.98rem; }
+    .md-h3 { font-size: 0.92rem; color: var(--accent); }
+    .md-h4 { font-size: 0.86rem; color: #a5d6ff; }
+    .md-ul {
+      margin: 6px 0 10px 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .md-li {
+      line-height: 1.45;
+      color: #e6edf3;
+    }
+    .md-li strong {
+      color: #fff;
+      font-weight: 600;
+    }
+    .md-p {
+      margin: 6px 0;
+      line-height: 1.45;
+      color: #d0d7de;
+    }
+    .md-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.82rem;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: rgba(88, 166, 255, 0.12);
+      border: 1px solid rgba(88, 166, 255, 0.25);
+      color: #a5d6ff;
+    }
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #238636; color: #fff; padding: 9px 18px; border-radius: 20px; font-size: 0.86rem; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 200; }
     .toast.show { opacity: 1; }
   </style>
@@ -494,7 +561,8 @@
     <div class="gate-banner">Are you calm enough?</div>
   </div>
   <div class="header-actions">
-    <button type="button" class="icon-btn" onclick="exportAtlasMarkdown()">Export Guide</button>
+    <button type="button" class="icon-btn" onclick="openImportModal()">Import Guide</button>
+    <button type="button" class="icon-btn" onclick="openExportModal()">Export / Save</button>
     <button type="button" class="icon-btn primary" onclick="openSectionModal()">+ Section</button>
   </div>
 </header>
@@ -510,12 +578,16 @@
   <div class="conclusions-card">
     <div class="conclusions-header">
       <div class="conclusions-title">📝 Global Conclusions &amp; Meta-Observations</div>
-      <span class="status-pill">Auto-Saved</span>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="status-pill" id="conclusions-status-pill">Auto-Saved</span>
+        <button type="button" class="icon-btn" id="conclusions-toggle-btn" onclick="toggleConclusionsEdit()" style="padding: 4px 10px; font-size: 0.78rem;">✎ Edit</button>
+      </div>
     </div>
     <p class="conclusions-sub">
-      High-level observations, systemic patterns, and grounded truths synthesized across your life domains.
+      High-level observations, systemic patterns, and grounded truths synthesized across your life domains. Click below to edit.
     </p>
-    <textarea id="global-conclusions-text" rows="5" class="conclusions-textarea" placeholder="Document longitudinal insights and meta-observations here..." oninput="saveGlobalConclusions()"></textarea>
+    <div id="global-conclusions-rendered" class="conclusions-rendered-view" onclick="enableConclusionsEdit()" title="Click to edit notes"></div>
+    <textarea id="global-conclusions-text" rows="10" class="conclusions-textarea" style="display:none;" placeholder="Document longitudinal insights and meta-observations here in Markdown..." oninput="saveGlobalConclusions()" onblur="disableConclusionsEdit()"></textarea>
   </div>
 </main>
 
@@ -567,6 +639,61 @@
     <div class="sub-label">Section Title</div>
     <input type="text" id="section-input-title" placeholder="e.g. Work &amp; Deadlines, Intimate Partner..." />
     <button type="button" class="primary-btn" style="margin-top:14px;" onclick="saveSectionFromModal()">Create Section</button>
+  </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="modal" id="import-modal" onclick="closeModalOnBg(event, 'import-modal')">
+  <div class="modal-sheet">
+    <div class="modal-top">
+      <strong style="font-size: 1rem;">Import Field Guide</strong>
+      <button type="button" class="icon-btn" onclick="closeModal('import-modal')">Close</button>
+    </div>
+    <p style="font-size: 0.83rem; color: var(--muted); margin: 8px 0 12px; line-height: 1.4;">
+      Update your active Atlas from your manually edited <code>FIELD_GUIDE.md</code>. This replaces the active browser state and auto-saves to local storage.
+    </p>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <button type="button" class="primary-btn" onclick="document.getElementById('field-guide-file-input').click()">
+        📂 Choose FIELD_GUIDE.md File
+      </button>
+      <input type="file" id="field-guide-file-input" accept=".md,text/markdown,text/plain" style="display:none;" onchange="handleFileImport(event)" />
+      <div style="display: flex; align-items: center; gap: 8px; margin: 2px 0;">
+        <hr style="flex: 1; border: none; border-top: 1px solid var(--border);" />
+        <span style="font-size: 0.72rem; color: var(--muted); text-transform: uppercase; font-weight: 600;">or paste markdown</span>
+        <hr style="flex: 1; border: none; border-top: 1px solid var(--border);" />
+      </div>
+      <textarea id="import-markdown-textarea" rows="6" class="conclusions-textarea" placeholder="Paste the complete contents of FIELD_GUIDE.md here..."></textarea>
+      <button type="button" class="icon-btn" style="padding: 10px; font-size: 0.86rem;" onclick="handleTextareaImport()">
+        Apply Pasted Markdown
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal" id="export-modal" onclick="closeModalOnBg(event, 'export-modal')">
+  <div class="modal-sheet">
+    <div class="modal-top">
+      <strong style="font-size: 1rem;">Export &amp; Save Field Guide</strong>
+      <button type="button" class="icon-btn" onclick="closeModal('export-modal')">Close</button>
+    </div>
+    <p style="font-size: 0.83rem; color: var(--muted); margin: 8px 0 14px; line-height: 1.4;">
+      Save your changes back to disk or copy the structured Markdown format.
+    </p>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <button type="button" class="primary-btn" onclick="downloadAtlasMarkdown()">
+        💾 Download FIELD_GUIDE.md
+      </button>
+      <p style="font-size: 0.76rem; color: var(--muted); margin: -4px 0 6px;">
+        Directly downloads the updated file so you can overwrite your local <code>FIELD_GUIDE.md</code>.
+      </p>
+      <button type="button" class="icon-btn" style="padding: 10px; font-size: 0.86rem;" onclick="copyAtlasMarkdown()">
+        📋 Copy Markdown to Clipboard
+      </button>
+      <p style="font-size: 0.76rem; color: var(--muted); margin: -4px 0 0;">
+        Copies the complete Markdown structure for pasting into your text editor or notes.
+      </p>
+    </div>
   </div>
 </div>
 
@@ -628,6 +755,7 @@
       prompt: "\"I am unloved, misunderstood, cast out, or relationally severed.\""
     }
   };
+  const SAIC_KEYS = Object.keys(SAIC_DATA);
 
   const ANNOTATIONS = {
     R1: "Mild irritation / background brace (-1, 6)",
@@ -776,7 +904,7 @@
       },
       {
         id: "sec-kids",
-        title: "Parenting & Kids' Challenges",
+        title: "Parenting, Kids & Home Logistics",
         patterns: [
           {
             id: "pat-kid-1",
@@ -785,18 +913,28 @@
             pattern: "Criticism / Correction",
             modifiers: ["Memory Loop"],
             saic: ["Identity", "Agency", "Connection", "Safety"],
-            reality: "Old wiring ≠ Failure, Adult now, Event is over (A child's mental health is complex, multi-factorial neurobiology and genetics—not caused by an imperfect reactive moment or snapped anger. Steady presence today is what matters; omnipotent self-blame is old guilt wiring.)",
-            notes: "Omnipotent self-blame assuming past snapped anger caused their struggle. Steady presence today is real."
+            reality: "Old wiring ≠ Failure, Adult now, Event is over",
+            notes: "A child's mental health is complex, multi-factorial neurobiology and genetics—not caused by an imperfect reactive moment or snapped anger. Steady presence today is what matters; omnipotent self-blame is old guilt wiring."
           },
           {
             id: "pat-kid-2",
-            title: "Short Reply, Eye Roll, or Feeling Dismissed at Home (Note: Rarely an issue with kids—they communicate honestly—more applicable to external/work interactions or general home friction if it ever occurs)",
+            title: "Small Kitchen Crowding / Waiting on Dinner Plating",
+            domain: "Environmental",
+            pattern: "Plan / System Friction",
+            modifiers: [],
+            saic: ["Agency", "Identity"],
+            reality: "Safe room, I have options, Adult now",
+            notes: "A five-minute variance in dinner timing is normal domestic friction, not a broken contract or imposition. Hovering in silence does not speed up plating; I can step out of the kitchen or state a clear boundary."
+          },
+          {
+            id: "pat-kid-3",
+            title: "Short Reply, Eye Roll, or Feeling Dismissed at Home",
             domain: "Interpersonal",
             pattern: "Tone / Dismissal",
             modifiers: [],
             saic: ["Connection", "Identity"],
             reality: "Event is over, Adult now",
-            notes: "Rarely an issue with kids; communicate honestly."
+            notes: "Rarely an issue with kids—they communicate honestly—more applicable to external/work interactions or general home friction if it ever occurs."
           }
         ]
       },
@@ -857,7 +995,8 @@
         ]
       }
     ],
-    globalConclusions: "Long-term synthesis and meta-observations across recurring patterns:\n- High-acuity spikes consistently trace back to Identity + Connection (fear of having caused harm, being exclusionary, or being inadequate).\n- Omnipotent parental responsibility falsely attributes multi-factorial neurobiology to momentary parenting imperfections.\n- Somatic bracing never resolves external crises; baseline calm is required before operant agency can be exercised."
+    fastDiagnostic: "When a novel trigger hits and isn't in the tables above, ask three questions:\n\n1. **Where did the input originate?** *(Step 1 Domain)*\n   * Another human's action, words, or absence $\\rightarrow$ **`Interpersonal`**\n   * External world, logistics, news, sirens, or sensory environment $\\rightarrow$ **`Environmental`**\n   * My own body, mistake, fatigue, or self-evaluation $\\rightarrow$ **`Personal`**\n2. **What is the system trying to do right now?** *(Step 1 Modifiers)*\n   * Is the event actually happening in this room, or am I replaying/rehearsing it? $\\rightarrow$ Toggle **`Memory Loop`**\n   * Am I mad at myself for having the reaction? $\\rightarrow$ Toggle **`Third Arrow`**\n3. **What is the core catastrophic rule firing underneath?** *(Step 3 SAIC)*\n   * *\"Someone/something is in danger or breaking down\"* $\\rightarrow$ **`Safety`**\n   * *\"I am trapped, powerless, forced, or responsible for fixing what I can't control\"* $\\rightarrow$ **`Agency`**\n   * *\"I am failing my standards, exposed, incompetent, or complicit\"* $\\rightarrow$ **`Identity`**\n   * *\"I am abandoned, misunderstood, cast out, or losing someone\"* $\\rightarrow$ **`Connection`**",
+    globalConclusions: "* **Primary Driver Overlap:** High-acuity spikes consistently trace back to **Identity + Connection** (fear of having caused harm, being thoughtless/exclusionary, or failing personal standards of care and composure).\n* **Omnipotent Responsibility Bias:** An automatic tendency to assume retroactive causal control over complex biology or external outcomes (e.g., retroactively fixing crisis calls, blaming oneself for multi-factorial child mental health based on a snapped moment of anger).\n* **Logistical Over-Ownership:** In domestic coordination (e.g., family meals), treating minor schedule drift or spatial crowding as an emergency breach of social contract—leading to chest bracing and silent hovering rather than explicit boundaries or letting others manage their own pace.\n* **Somatic Grounding Rule:** Internal physiological bracing in isolation never alters external reality or edits past events. Baseline calm must be restored before genuine adult agency and clean communication can occur.\n\nWhen you notice that chest tightness during plating, what happens if you physically walk to the dining table and sit down first instead of waiting by the counter?"
   };
 
   // --- SESSION STATE ---
@@ -913,11 +1052,126 @@
     localStorage.setItem(ATLAS_STORAGE_KEY, JSON.stringify(atlas));
   }
 
+  function escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function formatInlineMd(str) {
+    if (!str) return "";
+    return str
+      .replace(/`([^`]+)`/g, '<code class="md-code">$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
+  }
+
+  function renderSimpleMarkdown(md) {
+    if (!md || !md.trim()) {
+      return '<p style="color:var(--muted); font-style:italic; margin:0;">No meta-observations recorded yet. Tap ✎ Edit to add notes.</p>';
+    }
+    const lines = md.split(/\r?\n/);
+    let html = "";
+    let inList = false;
+
+    for (let rawLine of lines) {
+      let line = rawLine.trim();
+      if (!line) {
+        if (inList) { html += "</ul>"; inList = false; }
+        continue;
+      }
+
+      const hMatch = line.match(/^(#{1,4})\s+(.*)$/);
+      if (hMatch) {
+        if (inList) { html += "</ul>"; inList = false; }
+        const level = hMatch[1].length;
+        html += `<div class="md-h${level}">${formatInlineMd(escapeHtml(hMatch[2]))}</div>`;
+        continue;
+      }
+
+      const bMatch = line.match(/^[\*\-]\s+(.*)$/);
+      if (bMatch) {
+        if (!inList) { html += '<ul class="md-ul">'; inList = true; }
+        html += `<li class="md-li">${formatInlineMd(escapeHtml(bMatch[1]))}</li>`;
+        continue;
+      }
+
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<p class="md-p">${formatInlineMd(escapeHtml(line))}</p>`;
+    }
+    if (inList) { html += "</ul>"; inList = false; }
+    return html;
+  }
+
+  let isConclusionsEditing = false;
+
+  function updateConclusionsRendered() {
+    const ren = document.getElementById("global-conclusions-rendered");
+    if (ren && !isConclusionsEditing) {
+      ren.innerHTML = renderSimpleMarkdown(atlas.globalConclusions || "");
+    }
+  }
+
+  function toggleConclusionsEdit() {
+    if (isConclusionsEditing) {
+      disableConclusionsEdit();
+    } else {
+      enableConclusionsEdit();
+    }
+  }
+
+  function enableConclusionsEdit() {
+    isConclusionsEditing = true;
+    const ren = document.getElementById("global-conclusions-rendered");
+    const txt = document.getElementById("global-conclusions-text");
+    const btn = document.getElementById("conclusions-toggle-btn");
+    if (txt) {
+      txt.value = atlas.globalConclusions || "";
+      txt.style.display = "block";
+      txt.focus();
+    }
+    if (ren) ren.style.display = "none";
+    if (btn) {
+      btn.textContent = "✓ Done";
+      btn.classList.add("primary");
+    }
+  }
+
+  function disableConclusionsEdit() {
+    if (!isConclusionsEditing) return;
+    isConclusionsEditing = false;
+    const ren = document.getElementById("global-conclusions-rendered");
+    const txt = document.getElementById("global-conclusions-text");
+    const btn = document.getElementById("conclusions-toggle-btn");
+    if (txt) {
+      atlas.globalConclusions = txt.value;
+      saveAtlas();
+      txt.style.display = "none";
+    }
+    if (ren) {
+      ren.innerHTML = renderSimpleMarkdown(atlas.globalConclusions || "");
+      ren.style.display = "block";
+    }
+    if (btn) {
+      btn.textContent = "✎ Edit";
+      btn.classList.remove("primary");
+    }
+    flashConclusionsSaved();
+  }
+
+  function flashConclusionsSaved() {
+    const pill = document.getElementById("conclusions-status-pill");
+    if (pill) {
+      pill.textContent = "Saved ✓";
+      setTimeout(() => { if (pill) pill.textContent = "Auto-Saved"; }, 1500);
+    }
+  }
+
   function saveGlobalConclusions() {
     const el = document.getElementById("global-conclusions-text");
     if (el) {
       atlas.globalConclusions = el.value;
       saveAtlas();
+      flashConclusionsSaved();
     }
   }
 
@@ -1052,9 +1306,9 @@
         </div>
         <div class="detail-block">
           <div class="detail-label">Reality Anchor (Grounded Truth)</div>
-          <div class="reality-box">${pat.reality}</div>
+          <div class="reality-box">${formatInlineMd(escapeHtml(pat.reality))}</div>
         </div>
-        ${pat.notes ? `<div class="detail-block"><div class="detail-label">Observation Notes</div><div class="notes-box">${pat.notes}</div></div>` : ""}
+        ${pat.notes ? `<div class="detail-block"><div class="detail-label">Observation Notes</div><div class="notes-box">${formatInlineMd(escapeHtml(pat.notes))}</div></div>` : ""}
         <div class="body-checkin-drawer">
           <div class="body-checkin-toggle" onclick="toggleBodyCheckin('${pat.id}')">
             <span>🧭 Optional Body State (Energy &amp; Valence)</span>
@@ -1139,6 +1393,7 @@
     if (concEl && document.activeElement !== concEl) {
       concEl.value = atlas.globalConclusions || "";
     }
+    updateConclusionsRendered();
   }
 
   function openSectionModal() {
@@ -1316,28 +1571,249 @@
     }
   }
 
-  // --- EXPORT & HELPERS ---
-  function exportAtlasMarkdown() {
+  // --- IMPORT, EXPORT & STORAGE BRIDGE ---
+  function parseFieldGuideMarkdown(mdText) {
+    const lines = mdText.split(/\r?\n/);
+    const sections = [];
+    let currentSection = null;
+    let fastDiagLines = [];
+    let inFastDiag = false;
+    let conclusionsLines = [];
+    let inConclusions = false;
+
+    for (let line of lines) {
+      const h2Match = line.match(/^##\s+(?:(\d+)\.\s*)?(.*)$/);
+      if (h2Match) {
+        const rawTitle = h2Match[2].trim();
+        if (/conclusions?|meta-observation/i.test(rawTitle)) {
+          inConclusions = true;
+          inFastDiag = false;
+          currentSection = null;
+          continue;
+        } else if (/fast\s*diagnostic/i.test(rawTitle)) {
+          inFastDiag = true;
+          inConclusions = false;
+          currentSection = null;
+          continue;
+        } else {
+          inConclusions = false;
+          inFastDiag = false;
+          const slug = rawTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 15);
+          currentSection = {
+            id: "sec-" + slug + "-" + (sections.length + 1),
+            title: rawTitle,
+            patterns: []
+          };
+          sections.push(currentSection);
+          continue;
+        }
+      }
+
+      if (inConclusions) {
+        if (line.trim() !== "---") conclusionsLines.push(line);
+        continue;
+      }
+
+      if (inFastDiag) {
+        if (line.trim() !== "---") fastDiagLines.push(line);
+        continue;
+      }
+
+      if (currentSection && line.trim().startsWith("|")) {
+        const rawCols = line.split("|").map(c => c.trim());
+        if (rawCols.length > 0 && rawCols[0] === "") rawCols.shift();
+        if (rawCols.length > 0 && rawCols[rawCols.length - 1] === "") rawCols.pop();
+        if (rawCols.length < 4) continue;
+        const [col0, col1, col2, col3] = rawCols;
+        if (/recurring\s*scenario/i.test(col0) || /^:?-+:?$/.test(col0.replace(/\s+/g, ""))) continue;
+
+        const title = col0.replace(/\*\*/g, "").trim();
+        if (!title) continue;
+
+        const domainHits = [];
+        for (const d of DOMAINS) {
+          const idx = col1.indexOf(d);
+          if (idx !== -1) domainHits.push({ domain: d, idx });
+        }
+        domainHits.sort((a, b) => a.idx - b.idx);
+        const domain = domainHits.length > 0 ? domainHits[0].domain : "Personal";
+
+        const patternHits = [];
+        for (const p of PATTERNS) {
+          const idx = col1.indexOf(p);
+          if (idx !== -1) patternHits.push({ pattern: p, idx });
+        }
+        patternHits.sort((a, b) => a.idx - b.idx);
+        const pattern = patternHits.length > 0 ? patternHits[0].pattern : "Plan / System Friction";
+
+        const modifiers = [];
+        if (/Memory\s*Loop/i.test(col1)) modifiers.push("Memory Loop");
+        if (/Third\s*Arrow/i.test(col1)) modifiers.push("Third Arrow");
+        if (/\+?\s*Fast\s*Reflex/i.test(col1) && pattern !== "+ Fast Reflex") modifiers.push("+ Fast Reflex");
+
+        const saicHits = [];
+        for (const threat of ["Safety", "Agency", "Identity", "Connection"]) {
+          const idx = col2.search(new RegExp("\\b" + threat + "\\b", "i"));
+          if (idx !== -1) saicHits.push({ threat, idx });
+        }
+        saicHits.sort((a, b) => a.idx - b.idx);
+        const saic = saicHits.length > 0 ? saicHits.map(h => h.threat) : ["Agency"];
+
+        let reality = col3;
+        let notes = "";
+        const noteMatch = col3.match(/\*\(([\s\S]*?)\)\*\s*$/) || col3.match(/\(([\s\S]*?)\)\s*$/);
+        if (noteMatch) {
+          notes = noteMatch[1].trim();
+          reality = col3.slice(0, noteMatch.index).trim();
+        }
+
+        currentSection.patterns.push({
+          id: "pat-" + currentSection.id.replace("sec-", "") + "-" + (currentSection.patterns.length + 1),
+          title, domain, pattern, modifiers, saic, reality, notes
+        });
+      }
+    }
+
+    return {
+      sections,
+      fastDiagnostic: fastDiagLines.join("\n").trim(),
+      globalConclusions: conclusionsLines.join("\n").trim()
+    };
+  }
+
+  function generateAtlasMarkdown(sourceAtlas) {
+    const a = sourceAtlas || atlas;
     let out = "# Somatic Refactor: Personal Field Guide & Trigger Map\n\n";
-    atlas.sections.forEach((sec, idx) => {
+    out += "Use this guide when sitting down to run a reconsolidation pass. Find the closest scenario below to grab your **Step 1 tags**, **Step 3 SAIC threats**, and **Step 4 Reality Anchors** without overthinking.\n\n";
+    out += "---\n\n";
+
+    a.sections.forEach((sec, idx) => {
       out += `## ${idx + 1}. ${sec.title}\n\n`;
       out += "| Recurring Scenario | Step 1: Domain & Pattern | Step 3: SAIC Threats | Step 4: Reality Anchor |\n";
       out += "| :--- | :--- | :--- | :--- |\n";
       sec.patterns.forEach(p => {
-        const mods = p.modifiers.length ? ` + [${p.modifiers.join(", ")}]` : "";
-        const saicStr = p.saic.join(" + ");
+        const mods = p.modifiers && p.modifiers.length ? ` + [${p.modifiers.join(", ")}]` : "";
+        const saicStr = (p.saic || []).map(s => `**${s}**`).join(" + ");
         const notesStr = p.notes ? ` *(${p.notes})*` : "";
-        out += `| **${p.title}** | \`${p.domain}\` + \`${p.pattern}\`${mods} | **${saicStr}** | ${p.reality}${notesStr} |\n`;
+        out += `| **${p.title}** | \`${p.domain}\` + \`${p.pattern}\`${mods} | ${saicStr} | ${p.reality}${notesStr} |\n`;
       });
       out += "\n---\n\n";
     });
-    if (atlas.globalConclusions) {
-      out += "## 7. Global Conclusions & Meta-Observations\n\n";
-      out += atlas.globalConclusions + "\n";
+
+    if (a.fastDiagnostic) {
+      out += `## ${a.sections.length + 1}. Fast Diagnostic: How to Map Any New Trigger in 15 Seconds\n\n`;
+      out += a.fastDiagnostic + "\n\n---\n\n";
     }
-    copyText(out);
-    showToast("Exported Field Guide to clipboard");
+
+    if (a.globalConclusions) {
+      const concNum = a.fastDiagnostic ? a.sections.length + 2 : a.sections.length + 1;
+      out += `## ${concNum}. Global Conclusions & Meta-Observations\n\n`;
+      out += a.globalConclusions + "\n";
+    }
+
+    return out;
   }
+  function openImportModal() {
+    const ta = document.getElementById("import-markdown-textarea");
+    if (ta) ta.value = "";
+    openModal("import-modal");
+  }
+
+  function openExportModal() {
+    openModal("export-modal");
+  }
+
+  function applyImportedMarkdown(text) {
+    try {
+      const parsed = parseFieldGuideMarkdown(text);
+      if (!parsed || !parsed.sections || parsed.sections.length === 0) {
+        alert("Could not find any valid sections in the provided Markdown.");
+        return false;
+      }
+      const totalPatterns = parsed.sections.reduce((acc, s) => acc + s.patterns.length, 0);
+      if (totalPatterns === 0) {
+        alert("Parsed sections, but found no scenario table rows. Check the Markdown format.");
+        return false;
+      }
+
+      atlas = parsed;
+      saveAtlas();
+      renderAtlas();
+      closeModal("import-modal");
+      showToast(`Imported ${parsed.sections.length} sections & ${totalPatterns} patterns`);
+      return true;
+    } catch (err) {
+      console.error(err);
+      alert("Error parsing Markdown: " + err.message);
+      return false;
+    }
+  }
+
+  function handleFileImport(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      applyImportedMarkdown(e.target.result);
+    };
+    reader.readAsText(file);
+    event.target.value = "";
+  }
+
+  function handleTextareaImport() {
+    const val = document.getElementById("import-markdown-textarea").value;
+    if (!val.trim()) {
+      alert("Please paste Markdown text into the box first.");
+      return;
+    }
+    applyImportedMarkdown(val);
+  }
+
+  function downloadAtlasMarkdown() {
+    const md = generateAtlasMarkdown(atlas);
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "FIELD_GUIDE.md";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    closeModal("export-modal");
+    showToast("FIELD_GUIDE.md downloaded");
+  }
+
+  function copyAtlasMarkdown() {
+    const md = generateAtlasMarkdown(atlas);
+    copyText(md);
+    closeModal("export-modal");
+    showToast("Field Guide copied to clipboard");
+  }
+
+  function exportAtlasMarkdown() {
+    openExportModal();
+  }
+
+  // Support drag-and-drop file import onto the page
+  window.addEventListener("dragover", function(e) {
+    e.preventDefault();
+  });
+
+  window.addEventListener("drop", function(e) {
+    e.preventDefault();
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      if (file.name.endsWith(".md") || file.name.endsWith(".txt") || (file.type && file.type.includes("text"))) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          applyImportedMarkdown(evt.target.result);
+        };
+        reader.readAsText(file);
+      }
+    }
+  });
+
 
   function openModal(id) { document.getElementById(id).classList.add("open"); }
   function closeModal(id) { document.getElementById(id).classList.remove("open"); }

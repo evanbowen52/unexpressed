@@ -8,5 +8,8 @@ Thumbs.db
 # Google Drive pointer
 *.gdoc
 
+# Reference PDFs / docs
+*.pdf
+
 # Node / local caches
 node_modules/

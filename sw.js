@@ -1,5 +1,5 @@
-const CACHE_NAME = "somatic-refactor-v1";
-const ASSETS = ["./", "./index.html", "./manifest.json"];
+const CACHE_NAME = "somatic-refactor-v2";
+const ASSETS = ["./", "./index.html", "./manifest.json", "./FIELD_GUIDE.md"];
 
 self.addEventListener("install", event => {
   event.waitUntil(
@@ -17,8 +17,18 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
+// Network-First for online freshness, Cache fallback for offline reliability
 self.addEventListener("fetch", event => {
+  if (event.request.method !== "GET") return;
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    fetch(event.request)
+      .then(response => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });

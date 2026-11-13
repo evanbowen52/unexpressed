@@ -653,8 +653,11 @@
       Update your active Atlas from your manually edited <code>FIELD_GUIDE.md</code>. This replaces the active browser state and auto-saves to local storage.
     </p>
     <div style="display: flex; flex-direction: column; gap: 10px;">
-      <button type="button" class="primary-btn" onclick="document.getElementById('field-guide-file-input').click()">
-        📂 Choose FIELD_GUIDE.md File
+      <button type="button" class="primary-btn" onclick="fetchRepoFieldGuide()" style="background:#238636; border-color:#2ea043; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        🔄 Sync Latest FIELD_GUIDE.md from Repo
+      </button>
+      <button type="button" class="icon-btn" style="padding: 10px; font-size: 0.86rem;" onclick="document.getElementById('field-guide-file-input').click()">
+        📂 Choose Local File
       </button>
       <input type="file" id="field-guide-file-input" accept=".md,text/markdown,text/plain" style="display:none;" onchange="handleFileImport(event)" />
       <div style="display: flex; align-items: center; gap: 8px; margin: 2px 0;">
@@ -996,7 +999,7 @@
       }
     ],
     fastDiagnostic: "When a novel trigger hits and isn't in the tables above, ask three questions:\n\n1. **Where did the input originate?** *(Step 1 Domain)*\n   * Another human's action, words, or absence $\\rightarrow$ **`Interpersonal`**\n   * External world, logistics, news, sirens, or sensory environment $\\rightarrow$ **`Environmental`**\n   * My own body, mistake, fatigue, or self-evaluation $\\rightarrow$ **`Personal`**\n2. **What is the system trying to do right now?** *(Step 1 Modifiers)*\n   * Is the event actually happening in this room, or am I replaying/rehearsing it? $\\rightarrow$ Toggle **`Memory Loop`**\n   * Am I mad at myself for having the reaction? $\\rightarrow$ Toggle **`Third Arrow`**\n3. **What is the core catastrophic rule firing underneath?** *(Step 3 SAIC)*\n   * *\"Someone/something is in danger or breaking down\"* $\\rightarrow$ **`Safety`**\n   * *\"I am trapped, powerless, forced, or responsible for fixing what I can't control\"* $\\rightarrow$ **`Agency`**\n   * *\"I am failing my standards, exposed, incompetent, or complicit\"* $\\rightarrow$ **`Identity`**\n   * *\"I am abandoned, misunderstood, cast out, or losing someone\"* $\\rightarrow$ **`Connection`**",
-    globalConclusions: "* **Primary Driver Overlap:** High-acuity spikes consistently trace back to **Identity + Connection** (fear of having caused harm, being thoughtless/exclusionary, or failing personal standards of care and composure).\n* **Omnipotent Responsibility Bias:** An automatic tendency to assume retroactive causal control over complex biology or external outcomes (e.g., retroactively fixing crisis calls, blaming oneself for multi-factorial child mental health based on a snapped moment of anger).\n* **Logistical Over-Ownership:** In domestic coordination (e.g., family meals), treating minor schedule drift or spatial crowding as an emergency breach of social contract—leading to chest bracing and silent hovering rather than explicit boundaries or letting others manage their own pace.\n* **Somatic Grounding Rule:** Internal physiological bracing in isolation never alters external reality or edits past events. Baseline calm must be restored before genuine adult agency and clean communication can occur.\n\nWhen you notice that chest tightness during plating, what happens if you physically walk to the dining table and sit down first instead of waiting by the counter?"
+    globalConclusions: "### Core Daily Anchors\n* **Calm is capacity, not complicity.**\n* **Separate influence from control.**\n* **Arousal is information, not failure.**\n* **Extract the lesson, close the loop.**\n\n### Core Predictive Operating Logic\n* **Hyper-Conscientiousness & Omnipotent Causal Framing (`Identity` + `Agency`):** Across crises, parenting, caretaking, and domestic logistics, the nervous system defaults to assuming 100% causal responsibility—treating unresolved pain, complex biology, or minor schedule drift as personal failures to fix or guarantee.\n* **Arousal-as-Moral-Proof (`Calm = Complicity`):** Sympathetic bracing is routinely mistaken for ethical seriousness and care. Physiological calm is misread as negligence rather than the baseline prerequisite for sustained, effective action.\n* **High Self-Surveillance (`[Third Arrow]`):** Experiencing an intense autonomic spike violates an internal standard of composure, immediately triggering secondary `Identity` chagrin on top of a fast, legacy hardware reflex.\n* **Functional Stoicism Over External Venting:** Under asymmetric load or interpersonal friction, the reflex turns inward toward duty, self-scrutiny, or silent somatic holding rather than entitlement or outward blame.\n\n### Relational & Worldview Signatures\n* **Protective Attunement & Deficit Absorption:** Strong caretaking orientation paired with radar-like sensitivity to micro-ruptures. When others under-function (siblings) or move at a different pace (family dinner plating), the default reflex is to absorb the friction rather than tolerate the discomfort of letting a ball drop or stating an explicit boundary.\n* **Agency-Heavy Ethics (`Control as Safety`):** An implicit operating rule that preparation, careful speech, and tight logistical execution can prevent relational rupture and protect vulnerable people.\n\n### Structural Antidotes & Rules of Thumb\n* **Right-Size the Causal Footprint:** Separate *influence* (showing up steadily, cooking the meal, offering presence) from *control* (fixing multi-factorial neurobiology, another adult's choices, or others' pacing).\n* **Arousal Is Information, Not Failure:** Treat autonomic spikes as live diagnostic data indicating where a boundary, caretaking load, or old threat rule was tripped—not a character verdict.\n* **Close Loops Without Retroactive Editing:** Once an interaction, presentation, or crisis call ends and any concrete lesson is extracted, halt simulation replay.\n* **Somatic Grounding Rule:** Internal physiological bracing in isolation never alters external reality, speeds up a timeline, or edits past events. Baseline calm must be restored before genuine adult agency and clean communication can occur."
   };
 
   // --- SESSION STATE ---
@@ -1746,6 +1749,18 @@
       console.error(err);
       alert("Error parsing Markdown: " + err.message);
       return false;
+    }
+  }
+
+  async function fetchRepoFieldGuide() {
+    try {
+      const res = await fetch("./FIELD_GUIDE.md?v=" + Date.now());
+      if (!res.ok) throw new Error("Could not fetch FIELD_GUIDE.md (status " + res.status + ")");
+      const text = await res.text();
+      applyImportedMarkdown(text);
+    } catch (err) {
+      console.error(err);
+      alert("Error syncing FIELD_GUIDE.md from repository: " + err.message);
     }
   }
 

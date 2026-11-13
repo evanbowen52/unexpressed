@@ -561,7 +561,7 @@
     <div class="gate-banner">Are you calm enough?</div>
   </div>
   <div class="header-actions">
-    <button type="button" class="icon-btn" onclick="openImportModal()">Import Guide</button>
+    <button type="button" class="icon-btn" id="import-guide-btn" onclick="openImportModal()">Import Guide</button>
     <button type="button" class="icon-btn" onclick="openExportModal()">Export / Save</button>
     <button type="button" class="icon-btn primary" onclick="openSectionModal()">+ Section</button>
   </div>
@@ -652,6 +652,9 @@
     <p style="font-size: 0.83rem; color: var(--muted); margin: 8px 0 12px; line-height: 1.4;">
       Update your active Atlas from your manually edited <code>FIELD_GUIDE.md</code>. This replaces the active browser state and auto-saves to local storage.
     </p>
+    <div id="repo-update-notice" style="display:none; padding: 10px 12px; background: rgba(88,166,255,0.15); border: 1px solid var(--accent); border-radius: var(--radius); font-size: 0.82rem; margin-bottom: 10px; color: var(--text);">
+      💡 A newer version of <code>FIELD_GUIDE.md</code> was pushed to the repository. Tap below to sync.
+    </div>
     <div style="display: flex; flex-direction: column; gap: 10px;">
       <button type="button" class="primary-btn" onclick="fetchRepoFieldGuide()" style="background:#238636; border-color:#2ea043; display: flex; align-items: center; justify-content: center; gap: 6px;">
         🔄 Sync Latest FIELD_GUIDE.md from Repo
@@ -775,233 +778,6 @@
     G3: "Deep calm / rest (+5, 0)"
   };
 
-  const DEFAULT_ATLAS = {
-    sections: [
-      {
-        id: "sec-tip",
-        title: "TIP & Crisis Response",
-        patterns: [
-          {
-            id: "pat-tip-1",
-            title: "Post-Call Looping: \"Things I wish I had said\"",
-            domain: "Interpersonal",
-            pattern: "Criticism / Correction",
-            modifiers: ["Memory Loop"],
-            saic: ["Agency", "Identity"],
-            reality: "Event is over, Adult now (Steady presence matters more than perfect phrasing; grief isn't solved by a sentence.)",
-            notes: "Focus on steady presence rather than rehearsing retroactive fixes."
-          },
-          {
-            id: "pat-tip-2",
-            title: "Raw Scene Residue (Bodies, smells, sirens, intense emotion)",
-            domain: "Environmental",
-            pattern: "Sensory / Scene",
-            modifiers: ["Memory Loop"],
-            saic: ["Safety", "Agency"],
-            reality: "Safe room, Event is over (I am off-shift, physically safe, and in my own home.)",
-            notes: "Autonomic threat echo from high-acuity scene residue."
-          },
-          {
-            id: "pat-tip-3",
-            title: "Survivor's Story Hooking Personal History",
-            domain: "Personal",
-            pattern: "Sensory / Scene",
-            modifiers: ["Memory Loop"],
-            saic: ["Connection", "Safety"],
-            reality: "Adult now, Safe room (That is their crisis and old memory; my present life is intact.)",
-            notes: "Separate survivor's crisis and old memory from present safety."
-          }
-        ]
-      },
-      {
-        id: "sec-work",
-        title: "Presentations, Social Dynamics & Relational Guilt",
-        patterns: [
-          {
-            id: "pat-work-1",
-            title: "Worrying I Hurt Someone's Feelings or Excluded Them (\"Did I say/do something wrong?\")",
-            domain: "Interpersonal",
-            pattern: "Criticism / Correction",
-            modifiers: ["Memory Loop"],
-            saic: ["Identity", "Connection"],
-            reality: "Event is over, Old wiring ≠ Failure, Adult now (Hyper-vigilant mind-reading cannot rewrite interactions. If real repair is warranted, adult communication is direct; ruminative guilt is an old defense loop.)",
-            notes: "Primary personal loop. Check in directly if warranted; otherwise disengage from mind-reading."
-          },
-          {
-            id: "pat-work-2",
-            title: "Post-Presentation Looping (\"Wish I had said / not said\")",
-            domain: "Personal",
-            pattern: "Criticism / Correction",
-            modifiers: ["Memory Loop"],
-            saic: ["Identity", "Connection"],
-            reality: "Event is over, Old wiring ≠ Failure (The room has already moved on; replaying a closed event cannot edit it.)",
-            notes: "The room has moved on. Replaying cannot edit past events."
-          },
-          {
-            id: "pat-work-3",
-            title: "Receiving Feedback, Blame, or Scrutiny",
-            domain: "Interpersonal",
-            pattern: "Criticism / Correction",
-            modifiers: [],
-            saic: ["Identity", "Safety"],
-            reality: "Adult now, Old wiring ≠ Failure",
-            notes: "Status threat response; ground in adult standing."
-          },
-          {
-            id: "pat-work-4",
-            title: "Unanswered Message / Vague Plan / Waiting on Verdict",
-            domain: "Interpersonal",
-            pattern: "Silence / Ambiguity",
-            modifiers: [],
-            saic: ["Connection", "Agency"],
-            reality: "Safe room, I have options",
-            notes: "Tolerance of relational ambiguity without catastrophic projection."
-          }
-        ]
-      },
-      {
-        id: "sec-parents",
-        title: "Aging Parents, Dementia & Sibling Dynamics",
-        patterns: [
-          {
-            id: "pat-parent-1",
-            title: "Parent with Dementia (Repetition, confusion, resistance to care)",
-            domain: "Interpersonal",
-            pattern: "Plan / System Friction",
-            modifiers: [],
-            saic: ["Identity", "Agency", "Connection"],
-            reality: "Adult now, Event is over (Neurology is driving their behavior, not stubbornness. Stepping into the caretaker seat is a real role shift, not a personal failing.)",
-            notes: "Forced role reversal: losing the child seat and becoming the parent's caretaker."
-          },
-          {
-            id: "pat-parent-2",
-            title: "Parent Health Scare / Medical Decline / ER Visit",
-            domain: "Interpersonal",
-            pattern: "Plan / System Friction",
-            modifiers: ["+ Fast Reflex"],
-            saic: ["Safety", "Identity", "Agency"],
-            reality: "Safe room, Adult now, I have options (I am no longer a dependent child needing their protection to survive; I am a capable adult navigating reality.)",
-            notes: "Dissolution of primal safety anchor; ground in capable adult presence."
-          },
-          {
-            id: "pat-parent-3",
-            title: "Siblings Checked Out / Unequal Load / Second-Guessing You",
-            domain: "Interpersonal",
-            pattern: "Boundary / Demand",
-            modifiers: [],
-            saic: ["Agency", "Identity", "Connection"],
-            reality: "I have options, Adult now (Their avoidance or differing capacity is not my moral failure.)",
-            notes: "Differing capacity or avoidance is not a moral referendum on you."
-          },
-          {
-            id: "pat-parent-4",
-            title: "Replaying a Tense Family Call or Care Decision Later",
-            domain: "Interpersonal",
-            pattern: "Criticism / Correction",
-            modifiers: ["Memory Loop"],
-            saic: ["Identity", "Agency"],
-            reality: "Safe room, Event is over",
-            notes: "Post-call decision replay loop."
-          }
-        ]
-      },
-      {
-        id: "sec-kids",
-        title: "Parenting, Kids & Home Logistics",
-        patterns: [
-          {
-            id: "pat-kid-1",
-            title: "Son's Anxiety / Parental Self-Blame (\"I was snappy when he was younger; I can't forgive myself\")",
-            domain: "Personal",
-            pattern: "Criticism / Correction",
-            modifiers: ["Memory Loop", "Third Arrow"],
-            saic: ["Identity", "Agency", "Connection"],
-            reality: "Old wiring ≠ Failure, Adult now, Event is over (Surviving compound grief, a critically ill daughter, and financial collapse with frayed patience is biological physics, not a moral excuse. Anxiety is multi-factorial neurobiology—not caused by an exhausted parent snapping. Grief for that hard chapter is real; self-condemnation is false causality.)",
-            notes: "Surviving compound grief, a critically ill daughter, and financial collapse with frayed patience is biological physics, not a moral excuse. Anxiety is multi-factorial neurobiology—not caused by an exhausted parent snapping. Grief for that hard chapter is real; self-condemnation is false causality."
-          },
-          {
-            id: "pat-kid-2",
-            title: "Small Kitchen Crowding / Waiting on Dinner Plating",
-            domain: "Environmental",
-            pattern: "Plan / System Friction",
-            modifiers: [],
-            saic: ["Agency", "Identity"],
-            reality: "Safe room, I have options, Adult now",
-            notes: "A five-minute variance in dinner timing is normal domestic friction, not a broken contract or imposition. Hovering in silence does not speed up plating; I can step out of the kitchen or state a clear boundary."
-          },
-          {
-            id: "pat-kid-3",
-            title: "Short Reply, Eye Roll, or Feeling Dismissed at Home",
-            domain: "Interpersonal",
-            pattern: "Tone / Dismissal",
-            modifiers: [],
-            saic: ["Connection", "Identity"],
-            reality: "Event is over, Adult now",
-            notes: "Rarely an issue with kids—they communicate honestly—more applicable to external/work interactions or general home friction if it ever occurs."
-          }
-        ]
-      },
-      {
-        id: "sec-world",
-        title: "World Events, Moral Outrage & Personal Meta-Loops",
-        patterns: [
-          {
-            id: "pat-world-1",
-            title: "Grotesque Injustice on the News (ICE, Gaza, Ukraine) — \"Calm = Complicity\"",
-            domain: "Environmental",
-            pattern: "Sensory / Scene",
-            modifiers: [],
-            saic: ["Identity", "Agency"],
-            reality: "Calm ≠ Complicity, Safe room (Physiological bracing in my living room does not help anyone; clarity preserves capacity.)",
-            notes: "Bracing in living room does not assist victims; regulation preserves actual capacity."
-          },
-          {
-            id: "pat-world-2",
-            title: "The \"Third Arrow\" (Chagrin at Getting Triggered So Hard)",
-            domain: "Personal",
-            pattern: "Criticism / Correction",
-            modifiers: ["Memory Loop", "Third Arrow"],
-            saic: ["Identity"],
-            reality: "Old wiring ≠ Failure, Adult now (An automatic autonomic spike is old hardware firing, not a character flaw.)",
-            notes: "Autonomic spike is hardware reflex, not moral inadequacy."
-          },
-          {
-            id: "pat-world-3",
-            title: "Careless Mistake / Forgot Something / Broke Something",
-            domain: "Personal",
-            pattern: "Criticism / Correction",
-            modifiers: [],
-            saic: ["Identity", "Agency"],
-            reality: "Old wiring ≠ Failure, Event is over",
-            notes: "Internalized incompetence loop."
-          },
-          {
-            id: "pat-world-4",
-            title: "Own Fatigue, Brain Fog, or Unexplained Body Twinge",
-            domain: "Personal",
-            pattern: "Plan / System Friction",
-            modifiers: ["+ Fast Reflex"],
-            saic: ["Safety", "Agency"],
-            reality: "Safe room, I have options",
-            notes: "Somatic vulnerability triggering physical alarm."
-          },
-          {
-            id: "pat-world-5",
-            title: "Overwhelming To-Do List / Messy Space / Task Paralysis",
-            domain: "Personal",
-            pattern: "Boundary / Demand",
-            modifiers: [],
-            saic: ["Agency"],
-            reality: "I have options, Adult now",
-            notes: "Task paralysis from coercive demands; ground in autonomy."
-          }
-        ]
-      }
-    ],
-    fastDiagnostic: "### Step 0: The Pre-Refactor Gate (Wave vs. Loop)\nBefore opening the app or moving into PFC analysis, keep your behavioral steering wheel steady and let the somatic sensation move through your body unfiltered first. Then check the fork:\n\n* **Is it a Clean Affective Wave?** *(Grief on a crisis call, sadness over a parent's decline, moral anger at real cruelty, tenderness, or frustration that crests and metabolizes once felt without resistance.)*\n  * **Action:** **Do not refactor it.** Do not force immediate calm or over-analyze it. Regulation means staying behaviorally steady while real human emotion passes through the body—not eliminating feeling.\n* **Is it a Stuck Predictive Loop?** *(The sensation keeps re-firing because a false threat story, omnipotent self-blame, `[Memory Loop]`, or `[Third Arrow]` judgment is feeding it.)*\n  * **Action:** **Run the Somatic Refactor** using the three diagnostic questions below.\n\n### 15-Second Trigger Map (For Stuck Loops)\nWhen a stuck loop hits and isn't in the tables above, ask three questions:\n\n1. **Where did the input originate?** *(Step 1 Domain)*\n   * Another human's action, words, or absence $\\rightarrow$ **`Interpersonal`**\n   * External world, logistics, news, sirens, or sensory environment $\\rightarrow$ **`Environmental`**\n   * My own body, mistake, fatigue, or self-evaluation $\\rightarrow$ **`Personal`**\n2. **What is the system trying to do right now?** *(Step 1 Modifiers)*\n   * Is the event actually happening in this room, or am I replaying/rehearsing it? $\\rightarrow$ Toggle **`Memory Loop`**\n   * Am I mad at myself for having the reaction? $\\rightarrow$ Toggle **`Third Arrow`**\n3. **What is the core catastrophic rule firing underneath?** *(Step 3 SAIC)*\n   * *\"Someone/something is in danger or breaking down\"* $\\rightarrow$ **`Safety`**\n   * *\"I am trapped, powerless, forced, or responsible for fixing what I can't control\"* $\\rightarrow$ **`Agency`**\n   * *\"I am failing my standards, exposed, incompetent, or complicit\"* $\\rightarrow$ **`Identity`**\n   * *\"I am abandoned, misunderstood, cast out, or losing someone\"* $\\rightarrow$ **`Connection`**",
-    globalConclusions: "### Core Daily Anchors\n* **Feel the wave; refactor the loop.**\n* **Calm is capacity, not complicity.**\n* **Separate influence from control.**\n* **Arousal is information, not failure.**\n* **Extract the lesson, close the loop.**\n\n### Core Predictive Operating Logic\n* **Hyper-Conscientiousness & Omnipotent Causal Framing (`Identity` + `Agency`):** Across crises, parenting, caretaking, and domestic logistics, the nervous system defaults to assuming 100% causal responsibility—treating unresolved pain, complex biology, or minor schedule drift as personal failures to fix or guarantee.\n* **Arousal-as-Moral-Proof (`Calm = Complicity`):** Sympathetic bracing is routinely mistaken for ethical seriousness and care. Physiological calm is misread as negligence rather than the baseline prerequisite for sustained, effective action.\n* **High Self-Surveillance (`[Third Arrow]`):** Experiencing an intense autonomic spike violates an internal standard of composure, immediately triggering secondary `Identity` chagrin on top of a fast, legacy hardware reflex.\n* **Functional Stoicism & Premature Cognitive Bypass Risk:** Under asymmetric load or interpersonal friction, the reflex turns inward toward duty, self-scrutiny, or silent somatic holding rather than outward blame. A secondary risk is jumping immediately into PFC analysis or forced calming—cutting off valid, metabolizable human emotions (grief, sadness, anger, tenderness) before they finish moving through the body.\n\n### Relational & Worldview Signatures\n* **Protective Attunement & Deficit Absorption:** Strong caretaking orientation paired with radar-like sensitivity to micro-ruptures. When others under-function (siblings) or move at a different pace (family dinner plating), the default reflex is to absorb the friction rather than tolerate the discomfort of letting a ball drop or stating an explicit boundary.\n* **Agency-Heavy Ethics (`Control as Safety`):** An implicit operating rule that preparation, careful speech, and tight logistical execution can prevent relational rupture and protect vulnerable people.\n\n### Structural Antidotes & Rules of Thumb\n* **Feel the Wave Before Analyzing:** Allow acute, reality-congruent emotions to crest and pass through the body while maintaining steady adult behavior. Only engage the Somatic Refactor when an emotion stalls into a repetitive threat prediction or `[Memory Loop]`.\n* **Right-Size the Causal Footprint:** Separate *influence* (showing up steadily, cooking the meal, offering presence) from *control* (fixing multi-factorial neurobiology, another adult's choices, or others' pacing).\n* **Arousal Is Information, Not Failure:** Treat autonomic spikes as live diagnostic data indicating where a boundary, caretaking load, or old threat rule was tripped—not a character verdict.\n* **Close Loops Without Retroactive Editing:** Once an interaction, presentation, or crisis call ends and any concrete lesson is extracted, halt simulation replay.\n* **Somatic Grounding Rule:** Regulation is behavioral steadiness in the presence of emotion, not emotional flatness. While real affect should be allowed to move through the body, chronic physiological bracing in isolation never alters external reality, speeds up a timeline, or edits past events—and must be released so genuine adult agency and clean communication can operate."
-  };
-
   // --- SESSION STATE ---
   let state = createFreshState();
   let lastSavedMarkdown = "";
@@ -1031,28 +807,87 @@
 
   // --- ATLAS STATE & STORAGE ---
   const ATLAS_STORAGE_KEY = "somatic_refactor_atlas";
-  let atlas = loadAtlas();
+  const ATLAS_MODIFIED_KEY = "somatic_refactor_user_modified";
+  const ATLAS_HASH_KEY = "somatic_refactor_guide_hash";
+
+  let atlas = loadCachedAtlas();
   let openSections = new Set();
   let expandedEvents = new Set();
   let checkinState = {};
   let editingTarget = null;
   let modalChips = {};
 
-  function loadAtlas() {
+  function loadCachedAtlas() {
     try {
       const saved = localStorage.getItem(ATLAS_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed && Array.isArray(parsed.sections) && parsed.sections.length > 0) {
+        if (parsed && Array.isArray(parsed.sections)) {
           return parsed;
         }
       }
     } catch(e) {}
-    return JSON.parse(JSON.stringify(DEFAULT_ATLAS));
+    return { sections: [], fastDiagnostic: "", globalConclusions: "" };
   }
 
-  function saveAtlas() {
+  function saveAtlas(isUserModification = true) {
+    if (isUserModification) {
+      localStorage.setItem(ATLAS_MODIFIED_KEY, "true");
+    }
     localStorage.setItem(ATLAS_STORAGE_KEY, JSON.stringify(atlas));
+  }
+
+  function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return String(hash);
+  }
+
+  async function bootAtlas() {
+    renderAtlas();
+    updateConclusionsRendered();
+
+    try {
+      const res = await fetch("./FIELD_GUIDE.md?v=" + Date.now());
+      if (!res.ok) return;
+      const text = await res.text();
+      const hash = simpleHash(text);
+      const prevHash = localStorage.getItem(ATLAS_HASH_KEY);
+      const isUserModified = localStorage.getItem(ATLAS_MODIFIED_KEY) === "true";
+
+      if (!atlas.sections || atlas.sections.length === 0 || (!isUserModified && hash !== prevHash)) {
+        const parsed = parseFieldGuideMarkdown(text);
+        if (parsed && parsed.sections && parsed.sections.length > 0) {
+          atlas = parsed;
+          localStorage.setItem(ATLAS_STORAGE_KEY, JSON.stringify(atlas));
+          localStorage.setItem(ATLAS_HASH_KEY, hash);
+          renderAtlas();
+          updateConclusionsRendered();
+          if (prevHash && hash !== prevHash) {
+            showToast("Field Guide synced with repository updates");
+          }
+        }
+      } else if (isUserModified && hash !== prevHash) {
+        notifyRepoUpdateAvailable();
+      }
+    } catch (e) {
+      console.log("Remote Field Guide sync deferred:", e.message);
+    }
+  }
+
+  function notifyRepoUpdateAvailable() {
+    const notice = document.getElementById("repo-update-notice");
+    if (notice) notice.style.display = "block";
+    const btn = document.getElementById("import-guide-btn");
+    if (btn && !btn.querySelector(".update-dot")) {
+      const dot = document.createElement("span");
+      dot.className = "update-dot";
+      dot.style.cssText = "display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%; margin-left:6px; vertical-align:middle;";
+      btn.appendChild(dot);
+    }
   }
 
   function escapeHtml(str) {
@@ -1350,6 +1185,17 @@
     const container = document.getElementById("sections-container");
     if (!container) return;
     container.innerHTML = "";
+
+    if (!atlas.sections || atlas.sections.length === 0) {
+      container.innerHTML = `
+        <div style="padding: 36px 20px; text-align: center; color: var(--muted); border: 1px dashed var(--border); border-radius: var(--radius); margin: 12px 0;">
+          <div style="font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 6px;">Loading Field Guide...</div>
+          <div style="font-size: 0.83rem; margin-bottom: 14px;">If loading offline or from local disk, tap below to sync.</div>
+          <button type="button" class="primary-btn" onclick="fetchRepoFieldGuide()" style="display:inline-block; max-width:240px; margin: 0 auto; background:#238636; border-color:#2ea043;">🔄 Load FIELD_GUIDE.md</button>
+        </div>
+      `;
+      return;
+    }
 
     atlas.sections.forEach((sec, secIdx) => {
       const filtered = sec.patterns.filter(p => {
@@ -1726,7 +1572,7 @@
     openModal("export-modal");
   }
 
-  function applyImportedMarkdown(text) {
+  function applyImportedMarkdown(text, isRepoSync = false) {
     try {
       const parsed = parseFieldGuideMarkdown(text);
       if (!parsed || !parsed.sections || parsed.sections.length === 0) {
@@ -1740,10 +1586,21 @@
       }
 
       atlas = parsed;
-      saveAtlas();
+      if (isRepoSync) {
+        localStorage.removeItem(ATLAS_MODIFIED_KEY);
+        localStorage.setItem(ATLAS_HASH_KEY, simpleHash(text));
+        const notice = document.getElementById("repo-update-notice");
+        if (notice) notice.style.display = "none";
+        const dot = document.querySelector("#import-guide-btn .update-dot");
+        if (dot) dot.remove();
+      } else {
+        localStorage.setItem(ATLAS_MODIFIED_KEY, "true");
+      }
+      saveAtlas(!isRepoSync);
       renderAtlas();
+      updateConclusionsRendered();
       closeModal("import-modal");
-      showToast(`Imported ${parsed.sections.length} sections & ${totalPatterns} patterns`);
+      showToast(isRepoSync ? "Synced with FIELD_GUIDE.md" : `Imported ${parsed.sections.length} sections & ${totalPatterns} patterns`);
       return true;
     } catch (err) {
       console.error(err);
@@ -1757,7 +1614,7 @@
       const res = await fetch("./FIELD_GUIDE.md?v=" + Date.now());
       if (!res.ok) throw new Error("Could not fetch FIELD_GUIDE.md (status " + res.status + ")");
       const text = await res.text();
-      applyImportedMarkdown(text);
+      applyImportedMarkdown(text, true);
     } catch (err) {
       console.error(err);
       alert("Error syncing FIELD_GUIDE.md from repository: " + err.message);
@@ -1861,7 +1718,7 @@
     });
   }
 
-  renderAtlas();
+  bootAtlas();
 </script>
 </body>
 </html>
